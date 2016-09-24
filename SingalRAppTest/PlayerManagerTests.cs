@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace SingalRAppTest
 {
     [TestFixture]
-    public class PlayerManagerTest
+    public class PlayerManagerTests
     {
         
         [Test]
@@ -27,17 +27,7 @@ namespace SingalRAppTest
         [Test]
         public void AddClientToRemotePlayersTest()
         {
-            bool addPlayerToRoomCalled = false;
-            PlayerManager playerManager = new PlayerManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
-            var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
-            playerManager.conteClients = mockClients.Object;
-            dynamic all = new ExpandoObject();
-            all.addPlayerToRoom = new Action<string, string, double, double>((connectionId, name, xPos, yPos) =>
-            {
-                addPlayerToRoomCalled = true;
-            });
-            mockClients.Setup(m => m.AllExcept).Returns((ExpandoObject)all);
-            playerManager.AddClientToRemotePlayers('testid');
+
         }
     }
 }
