@@ -8,6 +8,6 @@ namespace SignalRApp.Server
 {
     interface IPlayer
     {
-
+        // NOT IMPLEMENTED
     }
 }

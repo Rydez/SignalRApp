@@ -8,6 +8,8 @@ namespace SignalRApp.Server
 {
     interface IPlayerManager
     {
+        // NOT IMPLEMENTED
+
         void InitializePlayer(string connectionId);
     }
 }

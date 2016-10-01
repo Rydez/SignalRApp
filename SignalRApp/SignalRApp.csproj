@@ -138,6 +138,13 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Client\css\index.css" />
+    <Content Include="Client\CursorFabric.js" />
+    <Content Include="Client\images\stick-player.png" />
+    <Content Include="Client\MapFabric.js" />
+    <Content Include="Client\MapSignal.js" />
+    <Content Include="Client\PlayerFabric.js" />
+    <Content Include="Client\PlayerManager.js" />
     <Content Include="packages.config" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -155,11 +162,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Client\Main.js" />
-    <Content Include="Client\PlayerManager.js" />
+    <Content Include="Client\PlayerSignal.js" />
     <Content Include="index.html" />
     <Content Include="Scripts\ai.0.15.0-build58334.js" />
     <Content Include="Scripts\ai.0.15.0-build58334.min.js" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="Scripts\fabric.js" />
+    <Content Include="Scripts\fabric.min.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
     <Content Include="Scripts\jquery.signalR-2.2.1.js" />

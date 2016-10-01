@@ -1,0 +1,10 @@
+﻿body {
+    background-color: black;
+}
+
+#main-container {
+    margin: auto;
+    height: 900px;
+    width:1240px;
+}
+

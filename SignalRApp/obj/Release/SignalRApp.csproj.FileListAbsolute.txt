@@ -45,3 +45,9 @@ C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\Newtonsoft.Json.xm
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\obj\Release\SignalRApp.csprojResolveAssemblyReference.cache
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\obj\Release\SignalRApp.dll
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\obj\Release\SignalRApp.pdb
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\Castle.Core.dll
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\Moq.dll
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\nunit.framework.dll
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\Castle.Core.xml
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\Moq.xml
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\nunit.framework.xml

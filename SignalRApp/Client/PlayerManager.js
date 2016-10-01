@@ -1,27 +1,39 @@
 ﻿
 var PlayerManager = {
-    _clientProxy: null,
+    initialize: function (gameProxy, gameCanvas) {
+        var _this = this;
 
-    // Initialize functions for server to call
-    initialize: function (gameProxy) {
-        this._clientProxy = gameProxy;
+        _this._gameProxy = gameProxy;
 
-        // Create player
-        this._clientProxy.client.addPlayerToRoom = function (id, name, xPos, yPos) {
-            $('#Game-Area')
-                .prepend($('<div><p>' + name + '</p></div>')
-                .attr('id', id)
-                .css({ position: 'absolute', left: xPos, top: yPos }));
-        }
+        // Constants to determine starting pos
+        var xStart = 6;
+        var yStart = 0;
 
-        // Remove player
-        this._clientProxy.client.removePlayerFromRoom = function (id) {
-            $('#' + id).remove();
-        }
+        // Player Fabric
+        var playerFabric = Object.create(PlayerFabric);
+        playerFabric.initialize(gameCanvas, xStart, yStart);
 
-        // Move player
-        this._clientProxy.client.movePlayer = function (id, xPos, yPos) {
-            $('#' + id).css({ left: xPos, top: yPos });
+        // CursorFabric
+        _this._cursorFabric = Object.create(CursorFabric);
+        _this._cursorFabric.initialize(gameCanvas, xStart, yStart);
+        //TODO//
+        // This should be moved into initialize
+        _this._cursorFabric.createCursor();
+
+        // PlayerSignal contains server calling functions
+        var playerSignal = Object.create(PlayerSignal);
+        playerSignal.initialize(_this._gameProxy, playerFabric);
+    },
+
+    controlPlayer: function (KeyCode) {
+        var _this = this;
+        _this._cursorFabric.moveCursor(KeyCode);
+
+        // Only move player if enter was pressed
+        if (KeyCode == 13) {
+            var _cursor = _this._cursorFabric;
+            _this._gameProxy.server.movePlayer(KeyCode, 
+                _cursor.xCursorPos, _cursor.yCursorPos);
         }
     }
 };

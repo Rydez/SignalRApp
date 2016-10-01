@@ -64,32 +64,14 @@ namespace SignalRApp.Server
         }
 
         // Move a player
-        public void Move(int KeyCode, string connectionId)
+        public void Move(string connectionId, int KeyCode, double xCursor, double yCursor)
         {
             // Get the player which has moved
             Player movingPlayer;
             IdPlayerPairs.TryGetValue(connectionId, out movingPlayer);
 
-            // Change its position
-            switch (KeyCode)
-            {
-                // w = 87
-                case 87:
-                    movingPlayer.yPos -= 5;
-                    break;
-                // a = 65
-                case 65:
-                    movingPlayer.xPos -= 5;
-                    break;
-                // s = 83
-                case 83:
-                    movingPlayer.yPos += 5;
-                    break;
-                // d = 68
-                case 68:
-                    movingPlayer.xPos += 5;
-                    break;
-            }
+            // Update player position to that of the cursor
+            movingPlayer.goToCursor(xCursor, yCursor);
 
             // Update all clients with the movement
             _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
