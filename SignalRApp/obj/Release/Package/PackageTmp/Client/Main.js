@@ -45,8 +45,9 @@
 
     // Initialize the player stuff
     var playerManager = Object.create(PlayerManager);
-    playerManager.initialize(gameProxy, gameCanvas,
-        gameConstants, mapFabric.getStructureIndices());
+    playerManager.initialize(gameProxy, gameCanvas, gameConstants,
+                             mapFabric.getStructureIndices(),
+                             mapFabric.getStructureObjects());
 
 
     // Start the connection.

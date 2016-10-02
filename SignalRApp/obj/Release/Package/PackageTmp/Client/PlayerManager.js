@@ -1,7 +1,8 @@
 ﻿
 var PlayerManager = {
     initialize: function (gameProxy, gameCanvas,
-                          gameConstants, structureIndices) {
+                          gameConstants, structureIndices,
+                          structureObjects) {
         var _this = this;
 
         _this._gameProxy = gameProxy;
@@ -12,7 +13,7 @@ var PlayerManager = {
 
         // Player Fabric
         var playerFabric = Object.create(PlayerFabric);
-        playerFabric.initialize(gameCanvas);
+        playerFabric.initialize(gameCanvas, structureObjects);
 
         // CursorFabric
         _this._cursorFabric = Object.create(CursorFabric);
@@ -36,7 +37,7 @@ var PlayerManager = {
         if (KeyCode == 13) {
             var _cursor = _this._cursorFabric;
             _this._gameProxy.server.movePlayer(KeyCode, 
-                _cursor.xCursorPos, _cursor.yCursorPos);
+                _cursor._xCursorIndex, _cursor._yCursorIndex);
         }
     }
 };

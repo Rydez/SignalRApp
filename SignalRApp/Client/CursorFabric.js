@@ -67,6 +67,14 @@ var CursorFabric = {
         // Padding extends the boundary inward
 
         // Change its position
+
+        //TODO//
+        // Find a better way to undo movement when
+        // there is a collision so that there is 
+        // less repetition. Checking collision is
+        // causing slow down of cursor movement.
+        // Try to break from collision check sooner
+
         // w = 87
         if (KeyCode == 87) {
             if (xIdx - yIdx > 1 && xIdx + yIdx < 2*mWidth - 4) {

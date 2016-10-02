@@ -140,8 +140,12 @@
   <ItemGroup>
     <Content Include="Client\css\index.css" />
     <Content Include="Client\CursorFabric.js" />
+    <Content Include="Client\images\archery_range.png" />
     <Content Include="Client\images\barracks.png" />
     <Content Include="Client\images\blacksmith.png" />
+    <Content Include="Client\images\house1.png" />
+    <Content Include="Client\images\house1b.png" />
+    <Content Include="Client\images\house1c.png" />
     <Content Include="Client\images\stable.png" />
     <Content Include="Client\images\stick-player.png" />
     <Content Include="Client\MapFabric.js" />
