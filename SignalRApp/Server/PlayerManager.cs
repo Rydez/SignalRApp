@@ -76,5 +76,14 @@ namespace SignalRApp.Server
             // Update all clients with the movement
             _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
         }
+
+        public void StartingPosition()
+        {
+            // Add players to new client
+            foreach (Player player in IdPlayerPairs.Values)
+            {
+                
+            }
+        }
     }
 }

@@ -12,6 +12,9 @@ namespace SignalRApp.Server
 
         public string name { get; set; }
 
+        public double xIndex { get; set; }
+        public double yIndex { get; set; }
+
         public double xPos { get; set; }
         public double yPos { get; set; }
 
@@ -19,12 +22,24 @@ namespace SignalRApp.Server
         public int X_OFF_SET { get; set; }
         public int Y_OFF_SET { get; set; }
 
+        public int TILE_WIDTH { get; set; }
+        public int TILE_HEIGHT { get; set; }
+
 
         // Constructor
         public Player()
         {
             X_OFF_SET = 7;
             Y_OFF_SET = -40;
+
+            TILE_WIDTH = 80;
+            TILE_HEIGHT = 40;
+
+            xIndex = 6;
+            yIndex = 0;
+
+            xPos = X_OFF_SET + 0.5 * TILE_WIDTH * (xIndex + yIndex);
+            yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }
 
         public void goToCursor(double xCursor, double yCursor)

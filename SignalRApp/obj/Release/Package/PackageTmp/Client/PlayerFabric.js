@@ -1,15 +1,12 @@
 ﻿
 var PlayerFabric = {
-    initialize: function (gameCanvas, xStart, yStart) {
+    initialize: function (gameCanvas) {
         var _this = this;
         _this._gameCanvas = gameCanvas;
 
         // In units of pixels
         _this._tileWidth = 80;
         _this._tileHeight = 40;
-
-        _this._xCursorIndex = xStart;
-        _this._yCursorIndex = yStart;
 
         // Off set the player pos to stand on tile
         _this._xOffSet = 7;
@@ -39,8 +36,8 @@ var PlayerFabric = {
 
             var playerFabricGroup = new fabric.Group([stickImage, playerLabel], {
                 id: id,
-                left: _this._xOffSet + 0.5 * _this._tileWidth * (_this._xCursorIndex + _this._yCursorIndex),
-                top: _this._yOffSet + 0.5 * _this._tileHeight * (_this._xCursorIndex - _this._yCursorIndex)
+                left: xPos,
+                top: yPos
             });
 
             _this._playerSprite = playerFabricGroup;
@@ -68,6 +65,7 @@ var PlayerFabric = {
         _this._gameCanvas.forEachObject(function (obj) {
             if (obj.id && obj.id === id) {
                 _this._gameCanvas.remove(obj);
+                _this._gameCanvas.renderAll();
             }
         });
     }
