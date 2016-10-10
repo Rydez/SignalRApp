@@ -42,10 +42,10 @@ namespace SignalRApp.Server
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }
 
-        public void goToCursor(double xCursorIndex, double yCursorIndex)
+        public void goToNextStep(double xStepIndex, double yStepIndex)
         {
-            xIndex = xCursorIndex;
-            yIndex = yCursorIndex;
+            xIndex = xStepIndex;
+            yIndex = yStepIndex;
             xPos = X_OFF_SET + 0.5 * TILE_WIDTH * (xIndex + yIndex);
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }

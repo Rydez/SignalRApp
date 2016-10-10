@@ -1,43 +1,84 @@
 ﻿
 var PlayerManager = {
     initialize: function (gameProxy, gameCanvas,
-                          gameConstants, structureIndices,
-                          structureObjects) {
+                          gameConstants, structureObjects,
+                          canvasDimensions) {
         var _this = this;
 
         _this._gameProxy = gameProxy;
 
-        // Constants to determine starting pos
-        //var xStart = 6;
-        //var yStart = 0;
+        _this.stepIncrement = 0;
+        _this.pathSteps = [];
+        _this.playerIsMoving = false;
 
         // Player Fabric
-        var playerFabric = Object.create(PlayerFabric);
-        playerFabric.initialize(gameCanvas, structureObjects);
-
-        // CursorFabric
-        _this._cursorFabric = Object.create(CursorFabric);
-        _this._cursorFabric.initialize(gameCanvas, gameConstants, structureIndices);
-        //TODO//
-        // This should be moved into initialize
-        _this._cursorFabric.createCursor();
+        _this.playerFabric = Object.create(PlayerFabric);
+        _this.playerFabric.initialize(gameCanvas, structureObjects,
+                                      canvasDimensions);
 
         // PlayerSignal contains server calling functions
         var playerSignal = Object.create(PlayerSignal);
-        playerSignal.initialize(_this._gameProxy, playerFabric);
+        playerSignal.initialize(_this._gameProxy, _this.playerFabric);
     },
 
-    //TODO//
-    // Should move this into PlayerSignal
-    controlPlayer: function (KeyCode) {
+    syncWithWindow: function (canvasDimensions) {
         var _this = this;
-        _this._cursorFabric.moveCursor(KeyCode);
 
+        _this.playerFabric.setCanvasWidth(canvasDimensions);
+    },
+
+    syncWithMap: function (shifts) {
+        var _this = this;
+
+        _this.playerFabric.setMapShifts(shifts);
+    },
+
+    syncWithCursor: function (pathSteps) {
+        var _this = this;
+
+        _this.pathSteps = pathSteps;
+    },
+
+    traversePath: function () {
+        var _this = this;
+        
+        _this.playerIsMoving = true;
+
+        var _pathSteps = _this.pathSteps
+        var _stepIncrement = _this.stepIncrement
+        
+        function takePathStep() {
+            if (_stepIncrement < _pathSteps.length) {
+                var currentStep = _pathSteps[_stepIncrement];
+
+                var xStepIndex = currentStep.xStepIndex;
+                var yStepIndex = currentStep.yStepIndex;
+
+                _this._gameProxy.server.movePlayer(xStepIndex, yStepIndex);
+
+                _stepIncrement += 1;
+
+                setTimeout(takePathStep, 100);
+            }
+            else {
+                _this.playerIsMoving = false;
+            }
+        }
+        setTimeout(takePathStep, 100);
+    },
+
+    //CONSIDER//
+    // Could move this into playerSignal
+    // if playerSignal and playerFabric were
+    // separate instead of together in this
+    // playerManager
+    controlPlayer: function (KeyCode, cursorIndices, cursorFabric) {
+        var _this = this;
+        
         // Only move player if enter was pressed
-        if (KeyCode == 13) {
-            var _cursor = _this._cursorFabric;
-            _this._gameProxy.server.movePlayer(KeyCode, 
-                _cursor._xCursorIndex, _cursor._yCursorIndex);
+        if (KeyCode === 13 && _this.playerIsMoving === false) {
+            _this.traversePath();
+            cursorFabric.resetPathSteps();
         }
     }
 };

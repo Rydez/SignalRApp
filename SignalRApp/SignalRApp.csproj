@@ -138,6 +138,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Client\CanvasManager.js" />
     <Content Include="Client\css\index.css" />
     <Content Include="Client\CursorFabric.js" />
     <Content Include="Client\images\archery_range.png" />
@@ -149,7 +150,6 @@
     <Content Include="Client\images\stable.png" />
     <Content Include="Client\images\stick-player.png" />
     <Content Include="Client\MapFabric.js" />
-    <Content Include="Client\MapSignal.js" />
     <Content Include="Client\PlayerFabric.js" />
     <Content Include="Client\PlayerManager.js" />
     <Content Include="packages.config" />

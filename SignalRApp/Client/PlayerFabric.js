@@ -1,24 +1,69 @@
 ﻿
 var PlayerFabric = {
-    initialize: function (gameCanvas, structureObjects) {
+    initialize: function (gameCanvas, structureObjects,
+                          canvasDimensions) {
         var _this = this;
         _this._gameCanvas = gameCanvas;
 
         _this._structureObjects = structureObjects;
 
+        _this._playerSprite;
+
         // In units of pixels
         _this._tileWidth = 80;
         _this._tileHeight = 40;
+
+        _this.mapLeftShift = 0;
+        _this.mapTopShift = 0;
+
+        _this._canvasPixelWidth = canvasDimensions.width;
+        _this._canvasPixelHeight = canvasDimensions.height;
 
         // Off set the player pos to stand on tile
         _this._xOffSet = 7;
         _this._yOffSet = -40;
     },
 
-    //TODO//
-    //Currently the xPos and yPos args arent being used
-    //Instead the player's pos is set on front-end.
-    //Move this to back-end.
+    setCanvasWidth: function () {
+        var _this = this;
+
+        _this._canvasPixelWidth = canvasDimensions.width;
+        _this._canvasPixelHeight = canvasDimensions.height;
+    },
+
+    setMapShifts: function (shifts) {
+        var _this = this;
+
+        _this.mapLeftShift = shifts.left;
+        _this.mapTopShift = shifts.top;
+
+        //// Update the structures with 
+        //// the correct positions
+        //for (var i = 0; i < _this._structureObjects.length; i++) {
+        //    var structObj = _this._structureObjects[i]
+
+        //    structObj.set({
+        //        left: shifts.left + structObj.getLeft(),
+        //        top: shifts.top + structObj.getTop()
+        //    });
+        //}
+    },
+
+    setObjectVisibility: function (obj, left, top) {
+        var _this = this;
+
+        // Don't render objects outside of canvas
+        if (left > _this._canvasPixelWidth ||
+            top > _this._canvasPixelHeight ||
+            left + obj.getWidth() < 0 ||
+            top + obj.getHeight() < 0) {
+            obj.visible = false;
+        }
+        else {
+            obj.visible = true;
+        }
+    },
+
     createPlayerSprite: function (id, name, xPos, yPos) {
         var _this = this;
         var playerImage = new fabric.Image.fromURL('Client/images/stick-player.png', function (img) {
@@ -38,12 +83,13 @@ var PlayerFabric = {
 
             var playerFabricGroup = new fabric.Group([stickImage, playerLabel], {
                 id: id,
-                left: xPos,
-                top: yPos
+                left: _this.mapLeftShift + xPos,
+                top: _this.mapTopShift + yPos
             });
 
             _this._playerSprite = playerFabricGroup;
             _this._gameCanvas.add(_this._playerSprite);
+            _this.handleStructureCollision(_this._playerSprite);
             _this._gameCanvas.renderAll();
         });
     },
@@ -53,12 +99,14 @@ var PlayerFabric = {
         var _this = this;
         _this._gameCanvas.forEachObject(function (obj) {
             if (obj.id && obj.id === id) {
+                var leftPlayer = _this.mapLeftShift + xPos;
+                var topPlayer = _this.mapTopShift + yPos;
+                _this.setObjectVisibility(obj, leftPlayer, topPlayer);
+
                 obj.set({
-                    left: xPos,
-                    top: yPos
+                    left: leftPlayer,
+                    top: topPlayer
                 });
-                //TODO//
-                // Check if this setCoords in necessary
                 obj.setCoords();
 
                 // Handle when the player is behind or

@@ -1,10 +1,31 @@
-﻿body {
+﻿html { 
+    height: 100%; 
+}
+
+body {
     background-color: black;
+    height: 97%;
 }
 
 #main-container {
+    position: absolute;
     margin: auto;
-    height: 900px;
-    width:1240px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 90%;
+    width: 95%;
+}
+
+#game-canvas {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 99%;
+    width: 99%;
 }
 

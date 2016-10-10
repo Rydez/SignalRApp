@@ -40,9 +40,9 @@ namespace SignalRApp.Hubs
         }
 
         // Function executed when on keydown
-        public void MovePlayer(int KeyCode, double xCursorIndex, double yCursorIndex)
+        public void MovePlayer(double xStepIndex, double yStepIndex)
         {
-            PlayerManager.Move(Context.ConnectionId, KeyCode, xCursorIndex, yCursorIndex);
+            PlayerManager.Move(Context.ConnectionId, xStepIndex, yStepIndex);
         }
     }
 }
