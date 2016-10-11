@@ -2,47 +2,45 @@
 var MapFabric = {
     initialize: function (gameCanvas, canvasDimensions,
                           gameConstants) {
-        var _this = this;
-        _this._gameCanvas = gameCanvas;
+
+        this.fabricUtilities = Object.create(FabricUtilities);
+
+        this._gameCanvas = gameCanvas;
         
-        _this.structureObjects = [];
+        this.structureObjects = [];
 
         // In units of tiles
-        _this._mapWidth = gameConstants.mapWidth;
-        _this._mapHeight = gameConstants.mapHeight;
+        this._mapWidth = gameConstants.mapWidth;
+        this._mapHeight = gameConstants.mapHeight;
 
         // In units of pixels
-        _this._canvasPixelWidth = canvasDimensions.width;
-        _this._canvasPixelHeight = canvasDimensions.height;
+        this._canvasPixelWidth = canvasDimensions.width;
+        this._canvasPixelHeight = canvasDimensions.height;
 
         // In units of pixels
-        _this._tileWidth = 80;
-        _this._tileHeight = 40;
-        _this._xOrigin = -0.5 * _this._tileWidth;
-        _this._yOrigin = -0.5 * _this._tileHeight;
-        _this._leftShift = 0;
-        _this._topShift = 0;
+        this._tileWidth = gameConstants.tileWidth;
+        this._tileHeight = gameConstants.tileHeight;
+        this._xOrigin = -0.5 * this._tileWidth;
+        this._yOrigin = -0.5 * this._tileHeight;
+        this._leftShift = 0;
+        this._topShift = 0;
 
-        _this.createMap();
+        this.createMap();
     },
 
     syncWithWindow: function (canvasDimensions) {
-        var _this = this;
-
-        _this._canvasPixelWidth = canvasDimensions.width;
-        _this._canvasPixelHeight = canvasDimensions.height;
+        this._canvasPixelWidth = canvasDimensions.width;
+        this._canvasPixelHeight = canvasDimensions.height;
     },
 
     createMap: function () {
-        var _this = this;
-        _this.createLand();
-        _this.createStructures();
-        _this._gameCanvas.renderAll();
+        this.createLand();
+        this.createStructures();
+        this._gameCanvas.renderAll();
     },
 
     createStructures: function () {
-        var _this = this;
-        _this.structureIndices = [];
+        this.structureIndices = [];
 
         //TODO//
         // Probably should move this to a
@@ -110,13 +108,13 @@ var MapFabric = {
         for (var i = 0; i < structureInfo.length; i++) {
             // 's' is shorthand for structureInfo[i]
             var s = structureInfo[i];
-            _this.structureTemplate(s.name, s.xIndex, s.yIndex,
+            this.structureTemplate(s.name, s.xIndex, s.yIndex,
                                     s.width, s.height, s.xOffSet,
                                     s.yOffSet);
 
             //TODO//
             // Move this stuff into a function called coverStructureIndices
-            var tilesWide = s.width / _this._tileWidth;
+            var tilesWide = s.width / this._tileWidth;
 
             // Move to lower corner to start dirtying
             var xStartIndex = Math.ceil(s.xIndex);
@@ -133,32 +131,28 @@ var MapFabric = {
                     coveredIndices.push(coveredIndex);
                 }
             }
-            _this.structureIndices.push(coveredIndices);
+            this.structureIndices.push(coveredIndices);
         }
     },
 
     getStructureIndices: function() {
-        var _this = this;
-        return _this.structureIndices;
+        return this.structureIndices;
     },
 
     getStructureObjects: function() {
-        var _this = this;
-        return _this.structureObjects;
+        return this.structureObjects;
     },
 
     getMapShifts: function () {
-        var _this = this;
         var shifts = {
-            left: _this._leftShift,
-            top: _this._topShift
+            left: this._leftShift,
+            top: this._topShift
         };
         return shifts;
     },
 
     structureTemplate: function (name, xIndex, yIndex, width, height, xOffSet, yOffSet) {
         var _this = this;
-
         var newStructure = new fabric.Image.fromURL('Client/images/' + name + '.png', function (img) {
 
             // Set lower left corner of image to tile indices   
@@ -172,46 +166,46 @@ var MapFabric = {
     },
 
     createLand: function () {
-        var _this = this;
-        for (var i = 0; i < _this._mapHeight; i++) {
-            for (var j = 0; j < _this._mapWidth; j++) {
+        for (var i = 0; i < this._mapHeight; i++) {
+            for (var j = 0; j < this._mapWidth; j++) {
                 // Off set every other row
-                var xOffSet = (i % 2 === 0) ? 0 : 0.5 * _this._tileWidth;
+                var xOffSet = (i % 2 === 0) ? 0 : 0.5 * this._tileWidth;
 
                 // Calculate position in units of pixels
-                var leftPosition = _this._xOrigin + xOffSet + j * _this._tileWidth;
-                var topPosition = _this._yOrigin + i * 0.5 * _this._tileHeight;
+                var leftPosition = this._xOrigin + xOffSet + j * this._tileWidth;
+                var topPosition = this._yOrigin + i * 0.5 * this._tileHeight;
 
                 // Create the tile
-                var tile = _this.getTile(leftPosition, topPosition);
+                var tile = this.getTile(leftPosition, topPosition);
 
-                _this._gameCanvas.add(tile);
+                this._gameCanvas.add(tile);
             }
         }
 
         // Convert land tiles into 
         // background image
-        _this.cacheLand();
+        this.cacheLand();
     },
 
     cacheLand: function () {
-        var _this = this;
+        
 
         // Expand canvas to create an image of entire canvas
-        _this._gameCanvas.setWidth(_this._mapWidth * _this._tileWidth - 0.5 * _this._tileWidth);
-        _this._gameCanvas.setHeight(_this._mapHeight * 0.5 * _this._tileHeight - 0.5 * _this._tileHeight);
+        this._gameCanvas.setWidth(this._mapWidth * this._tileWidth - 0.5 * this._tileWidth);
+        this._gameCanvas.setHeight(this._mapHeight * 0.5 * this._tileHeight - 0.5 * this._tileHeight);
 
         // Create png URL of canvas
-        var cachedLandImage = _this._gameCanvas.toDataURL('png');
+        var cachedLandImage = this._gameCanvas.toDataURL('png');
 
         // Remove the tile objects
-        _this._gameCanvas.clear();
+        this._gameCanvas.clear();
 
         // Set canvas back to correct size
-        _this._gameCanvas.setWidth(_this._canvasPixelWidth);
-        _this._gameCanvas.setHeight(_this._canvasPixelHeight);
+        this._gameCanvas.setWidth(this._canvasPixelWidth);
+        this._gameCanvas.setHeight(this._canvasPixelHeight);
 
         // Set background with image of tiles
+        var _this = this;
         var backgroundImage = new fabric.Image.fromURL(cachedLandImage, function (img) {
             var img = img.set({
                 id: 'landBackground'
@@ -235,7 +229,6 @@ var MapFabric = {
     },
 
     controlMap: function (KeyCode) {
-        var _this = this;
 
         // Best to have delta set to a number
         // which divides evenly into the width
@@ -269,33 +262,13 @@ var MapFabric = {
             return;
         }
 
-        _this.updateMapPosition(leftDelta, topDelta);
-    },
-
-    // This might not belong in mapFabric. Maybe
-    // too general for that. This function is also
-    // used in canvasManager
-    setObjectVisibility: function (obj, left, top) {
-        var _this = this;
-
-        // Don't render objects outside of canvas
-        if (left > _this._canvasPixelWidth ||
-            top > _this._canvasPixelHeight ||
-            left + obj.getWidth() < 0 ||
-            top + obj.getHeight() < 0) {
-            obj.visible = false;
-        }
-        else {
-            obj.visible = true;
-        }
+        this.updateMapPosition(leftDelta, topDelta);
     },
 
     updateMapPosition: function (leftDelta, topDelta) {
-        var _this = this;
+        var canvasObjects = this._gameCanvas.getObjects();
 
-        var canvasObjects = _this._gameCanvas.getObjects();
-
-        var atBoundary = _this.checkForBoundary(canvasObjects, leftDelta, topDelta);
+        var atBoundary = this.checkForBoundary(canvasObjects, leftDelta, topDelta);
 
         if (atBoundary) {
             return;
@@ -306,9 +279,10 @@ var MapFabric = {
             var currentLeft = canvasObjects[i].getLeft();
             var currentTop = canvasObjects[i].getTop();
 
-            _this.setObjectVisibility(canvasObjects[i],
-                                      currentLeft,
-                                      currentTop);
+            this.fabricUtilities.setObjectVisibility(canvasObjects[i],
+                                                     currentLeft, currentTop,
+                                                     this._canvasPixelWidth,
+                                                     this._canvasPixelHeight);
 
             // Update bbject positions
             canvasObjects[i].set({
@@ -319,14 +293,13 @@ var MapFabric = {
         }
 
         // Update current map shifts
-        _this._leftShift += leftDelta;
-        _this._topShift += topDelta;
+        this._leftShift += leftDelta;
+        this._topShift += topDelta;
 
-        _this._gameCanvas.renderAll();
+        this._gameCanvas.renderAll();
     },
 
     checkForBoundary: function (canvasObjects, leftDelta, topDelta) {
-        var _this = this;
 
         for (var i = 0; i < canvasObjects.length; i++) {
             // Obj is shorthand for canvasObjects[i]
@@ -343,8 +316,8 @@ var MapFabric = {
             if (obj.id && obj.id === 'landBackground') {
                 if (objLeft + leftDelta > 0 ||
                     objTop  + topDelta  > 0 ||
-                    objLeft + objWidth  + leftDelta < _this._canvasPixelWidth ||
-                    objTop  + objHeight + topDelta  < _this._canvasPixelHeight) {
+                    objLeft + objWidth + leftDelta < this._canvasPixelWidth ||
+                    objTop  + objHeight + topDelta < this._canvasPixelHeight) {
                     atBoundary = true;
                     return atBoundary;
                 }

@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Client\CanvasManager.js" />
+    <Content Include="Client\Common\FabricUtilities.js" />
     <Content Include="Client\css\index.css" />
     <Content Include="Client\CursorFabric.js" />
     <Content Include="Client\images\archery_range.png" />
@@ -147,6 +148,7 @@
     <Content Include="Client\images\house1.png" />
     <Content Include="Client\images\house1b.png" />
     <Content Include="Client\images\house1c.png" />
+    <Content Include="Client\images\pine-none08.png" />
     <Content Include="Client\images\stable.png" />
     <Content Include="Client\images\stick-player.png" />
     <Content Include="Client\MapFabric.js" />

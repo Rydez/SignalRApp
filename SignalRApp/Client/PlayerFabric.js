@@ -1,67 +1,39 @@
 ﻿
 var PlayerFabric = {
     initialize: function (gameCanvas, structureObjects,
-                          canvasDimensions) {
-        var _this = this;
-        _this._gameCanvas = gameCanvas;
+                          canvasDimensions, gameConstants) {
 
-        _this._structureObjects = structureObjects;
+        this.fabricUtilities = Object.create(FabricUtilities);
 
-        _this._playerSprite;
+        this._gameCanvas = gameCanvas;
+
+        this._structureObjects = structureObjects;
+
+        this._playerSprite;
 
         // In units of pixels
-        _this._tileWidth = 80;
-        _this._tileHeight = 40;
+        this._tileWidth = gameConstants.tileWidth;
+        this._tileHeight = gameConstants.tileHeight;
 
-        _this.mapLeftShift = 0;
-        _this.mapTopShift = 0;
+        this.mapLeftShift = 0;
+        this.mapTopShift = 0;
 
-        _this._canvasPixelWidth = canvasDimensions.width;
-        _this._canvasPixelHeight = canvasDimensions.height;
+        this._canvasPixelWidth = canvasDimensions.width;
+        this._canvasPixelHeight = canvasDimensions.height;
 
         // Off set the player pos to stand on tile
-        _this._xOffSet = 7;
-        _this._yOffSet = -40;
+        this._xOffSet = 7;
+        this._yOffSet = -40;
     },
 
-    setCanvasWidth: function () {
-        var _this = this;
-
-        _this._canvasPixelWidth = canvasDimensions.width;
-        _this._canvasPixelHeight = canvasDimensions.height;
+    setCanvasWidth: function (canvasDimensions) {
+        this._canvasPixelWidth = canvasDimensions.width;
+        this._canvasPixelHeight = canvasDimensions.height;
     },
 
     setMapShifts: function (shifts) {
-        var _this = this;
-
-        _this.mapLeftShift = shifts.left;
-        _this.mapTopShift = shifts.top;
-
-        //// Update the structures with 
-        //// the correct positions
-        //for (var i = 0; i < _this._structureObjects.length; i++) {
-        //    var structObj = _this._structureObjects[i]
-
-        //    structObj.set({
-        //        left: shifts.left + structObj.getLeft(),
-        //        top: shifts.top + structObj.getTop()
-        //    });
-        //}
-    },
-
-    setObjectVisibility: function (obj, left, top) {
-        var _this = this;
-
-        // Don't render objects outside of canvas
-        if (left > _this._canvasPixelWidth ||
-            top > _this._canvasPixelHeight ||
-            left + obj.getWidth() < 0 ||
-            top + obj.getHeight() < 0) {
-            obj.visible = false;
-        }
-        else {
-            obj.visible = true;
-        }
+        this.mapLeftShift = shifts.left;
+        this.mapTopShift = shifts.top;
     },
 
     createPlayerSprite: function (id, name, xPos, yPos) {
@@ -101,7 +73,11 @@ var PlayerFabric = {
             if (obj.id && obj.id === id) {
                 var leftPlayer = _this.mapLeftShift + xPos;
                 var topPlayer = _this.mapTopShift + yPos;
-                _this.setObjectVisibility(obj, leftPlayer, topPlayer);
+
+                _this.fabricUtilities.setObjectVisibility(obj,
+                                         leftPlayer, topPlayer,
+                                         this._canvasPixelWidth,
+                                         this._canvasPixelHeight);
 
                 obj.set({
                     left: leftPlayer,
@@ -119,9 +95,8 @@ var PlayerFabric = {
     },
 
     handleStructureCollision: function (playerObj) {
-        var _this = this;
 
-        var structObjs = _this._structureObjects;
+        var structObjs = this._structureObjects;
 
         // Loop through structures to find if the player
         // is within a structure or intersecting with it
@@ -129,19 +104,18 @@ var PlayerFabric = {
             if (playerObj.intersectsWithObject(structObjs[i]) ||
                 playerObj.isContainedWithinObject(structObjs[i])) {
                 // Determine to bring player forward, or send backward.
-                var playerDepth = _this.calculatePlayerDepth(playerObj, structObjs[i]);
+                var playerDepth = this.calculatePlayerDepth(playerObj, structObjs[i]);
                 if (playerDepth === 'inFront') {
-                    _this._gameCanvas.bringToFront(playerObj);
+                    this._gameCanvas.bringToFront(playerObj);
                 }
                 else {
-                    _this._gameCanvas.bringToFront(structObjs[i]);
+                    this._gameCanvas.bringToFront(structObjs[i]);
                 }
             }
         }
     },
 
     calculatePlayerDepth: function (playerObj, structObj) {
-        var _this = this;
 
         // Start with player in front
         var depth = 'inFront';
@@ -159,11 +133,11 @@ var PlayerFabric = {
         var yBottomOfStruct = yStructPos + structHeight;
 
         // Get the width of the structure in units of tiles
-        var structTileWidth = Math.round(structObj.getWidth() / _this._tileWidth);
+        var structTileWidth = Math.round(structObj.getWidth() / this._tileWidth);
 
         // Calculate the middle of the base of the structure.
         // This is the widest part of the structure sprite.
-        var yStructBaseMidPoint = yBottomOfStruct - structTileWidth * 0.5 * _this._tileHeight;
+        var yStructBaseMidPoint = yBottomOfStruct - structTileWidth * 0.5 * this._tileHeight;
 
         // Add bias to having player behind rather than infront
         var BEHIND_BIAS_OFF_SET = 30;
