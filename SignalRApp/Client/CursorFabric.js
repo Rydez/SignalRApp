@@ -84,7 +84,6 @@ var CursorFabric = {
         });
         this._cursor = cursor;
         this._gameCanvas.add(this._cursor);
-        this._gameCanvas.renderAll();
     },
 
     cursorCollision: function (xCursorIndex, yCursorIndex) {
@@ -135,8 +134,8 @@ var CursorFabric = {
         this._gameCanvas.add(pathTile);
 
         // Bring the path tiles above the land image.
-        // Land image is first, so cursor is second.
-        pathTile.moveTo(2);
+        // Land image is zeroth, so cursor stuff is first.
+        pathTile.moveTo(1);
     },
 
     updateCursorPosition: function () {
@@ -159,13 +158,15 @@ var CursorFabric = {
 
     uncreatePath: function () {
 
-        var stepObj = this.pathSteps[0];
-        this._xCursorIndex = stepObj.xStepIndex;
-        this._yCursorIndex = stepObj.yStepIndex;
+        if (event.which === 27) {
+            var stepObj = this.pathSteps[0];
+            this._xCursorIndex = stepObj.xStepIndex;
+            this._yCursorIndex = stepObj.yStepIndex;
         
-        this.updateCursorPosition();
+            this.updateCursorPosition();
 
-        this.resetPathSteps();
+            this.resetPathSteps();
+        }
     },
 
     moveCursor: function (KeyCode) {

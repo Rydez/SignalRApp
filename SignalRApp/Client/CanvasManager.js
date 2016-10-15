@@ -46,7 +46,7 @@ var CanvasManager = {
         this.gameCanvas.renderOnAddRemove = false;
         this.gameCanvas.stateful = false;
         this.gameCanvas.skipTargetFind = true;
-        this.gameCanvas.backgroundColor = "white";
+        this.gameCanvas.backgroundColor = 'rgb(66, 48, 19)';
         this.calculateCanvasSize();
     },
 

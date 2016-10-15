@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 namespace SignalRApp.Server
 {
-    public class PlayerManager : IPlayerManager 
+    public class PlayerManager
     {
         private readonly IHubContext _context;
 
@@ -55,12 +55,20 @@ namespace SignalRApp.Server
             _context.Clients.All.removePlayerFromRoom(disconnectedPlayer.ConnectionId);
         }
 
-        public void Name(string name, string connectionId)
+        public void SetName(string name, string connectionId)
         {
             Player unnamedPlayer;
             IdPlayerPairs.TryGetValue(connectionId, out unnamedPlayer);
 
             unnamedPlayer.name = name;
+        }
+
+        public string GetName(string connectionId)
+        {
+            Player namedPlayer;
+            IdPlayerPairs.TryGetValue(connectionId, out namedPlayer);
+
+            return namedPlayer.name;
         }
 
         // Move a player

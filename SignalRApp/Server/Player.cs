@@ -6,7 +6,7 @@ using System.Web;
 namespace SignalRApp.Server
 {
     // Class
-    public class Player : IPlayer
+    public class Player
     {
         public string ConnectionId { get; set; }
 
@@ -29,11 +29,6 @@ namespace SignalRApp.Server
         // Constructor
         public Player()
         {
-            //TODO//
-            // Should probably remove the
-            // off sets and tile dimensions.
-            // Just use indices to reduce duplicated
-            // information.
             X_OFF_SET = 7;
             Y_OFF_SET = -40;
 

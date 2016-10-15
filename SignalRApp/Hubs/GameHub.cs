@@ -14,6 +14,9 @@ namespace SignalRApp.Hubs
         // Create a PlayerManager
         public PlayerManager PlayerManager = new PlayerManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
 
+        // Create a ChatManager
+        public ChatManager ChatManager = new ChatManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
+
         // Function executed when client connects
         public override Task OnConnected()
         {
@@ -30,7 +33,7 @@ namespace SignalRApp.Hubs
 
         public void NamePlayer(string name)
         {
-            PlayerManager.Name(name, Context.ConnectionId);
+            PlayerManager.SetName(name, Context.ConnectionId);
         }
 
         public void SyncPlayers()
@@ -43,6 +46,12 @@ namespace SignalRApp.Hubs
         public void MovePlayer(double xStepIndex, double yStepIndex)
         {
             PlayerManager.Move(Context.ConnectionId, xStepIndex, yStepIndex);
+        }
+
+        public void SendMessageToAll(string message)
+        {
+            string senderName = PlayerManager.GetName(Context.ConnectionId);
+            ChatManager.SendToAll(Context.ConnectionId, senderName, message);
         }
     }
 }
