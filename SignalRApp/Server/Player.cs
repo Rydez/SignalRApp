@@ -29,8 +29,8 @@ namespace SignalRApp.Server
         // Constructor
         public Player()
         {
-            X_OFF_SET = 7;
-            Y_OFF_SET = -40;
+            X_OFF_SET = 40;
+            Y_OFF_SET = 7;
 
             TILE_WIDTH = 80;
             TILE_HEIGHT = 40;

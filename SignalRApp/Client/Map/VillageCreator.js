@@ -103,8 +103,10 @@ var VillageCreator = {
                 top: topPosition
             });
             _this._gameCanvas.add(grassTileImage);
-
+            grassTileImage.selectable = false;
             // Cache once last grass tile added
+            // The cursor might alseo be loaded,
+            // so this could be off by one.
             if (_this._gameCanvas.getObjects().length === _this._mapWidth * _this._mapHeight) {
                 _this.cacheLand();
             }
@@ -122,6 +124,7 @@ var VillageCreator = {
             });
             _this.structureObjects.push(structureImage);
             _this._gameCanvas.add(structureImage);
+            structureImage.selectable = false;
         });
     },
 
@@ -149,6 +152,7 @@ var VillageCreator = {
             });
             _this.villageBackground = landImg;
             _this._gameCanvas.add(_this.villageBackground);
+            _this.villageBackground.selectable = false;
         });
     },
 

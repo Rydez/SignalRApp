@@ -38,12 +38,15 @@ var PlayerCreator = {
 
             var playerFabricGroup = new fabric.Group([stickImage, playerLabel], {
                 id: id,
+                originX: 'center',
+                originY: 'center',
                 left: _this.mapLeftShift + xPos,
                 top: _this.mapTopShift + yPos
             });
 
             _this._playerSprite = playerFabricGroup;
             _this._gameCanvas.add(_this._playerSprite);
+            _this._playerSprite.selectable = false;
             _this.playerUtilities.handleStructureCollision(_this._playerSprite,
                     _this._structureObjects, _this._gameCanvas);
         });

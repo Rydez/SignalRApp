@@ -136,6 +136,7 @@ var CursorFabric = {
         // Bring the path tiles above the land image.
         // Land image is zeroth, so cursor stuff is first.
         pathTile.moveTo(1);
+        pathTile.selectable = false;
     },
 
     updateCursorPosition: function () {

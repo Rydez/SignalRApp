@@ -58,7 +58,7 @@ var PlayerUtilities = {
         var yStructBaseMidPoint = yBottomOfStruct - structTileWidth * 0.5 * this._tileHeight;
 
         // Add bias to having player behind rather than infront
-        var BEHIND_BIAS_OFF_SET = 30;
+        var BEHIND_BIAS_OFF_SET = 80;
 
         // If the player is above this middle, then the
         // player is behind the structure

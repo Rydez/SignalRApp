@@ -22,9 +22,13 @@ var CanvasManager = {
         this.yStartIndex = 0;
 
         // Reference the canvas
-        this.gameCanvas = new fabric.StaticCanvas('game-canvas');
+        this.gameCanvas = new fabric.Canvas('game-canvas');
 
         this.setCanvasProperties();
+
+        this.gameCanvas.on('mouse:up', function (event) {
+            console.log(event);
+        });
     },
 
     getCanvas: function () {
@@ -43,10 +47,15 @@ var CanvasManager = {
     setCanvasProperties: function () {
 
         // Optimization configurations
+
+        // Commented to enable correct event targets
+        //this.gameCanvas.skipTargetFind = true;
         this.gameCanvas.renderOnAddRemove = false;
         this.gameCanvas.stateful = false;
-        this.gameCanvas.skipTargetFind = true;
+        this.gameCanvas.selection = false;
         this.gameCanvas.backgroundColor = 'rgb(66, 48, 19)';
+        this.gameCanvas.hoverCursor = 'default';
+        this.gameCanvas.defaultCursor = 'default';
         this.calculateCanvasSize();
     },
 
