@@ -39,7 +39,6 @@ var VillageCreator = {
                 var topPosition = this._yOrigin + i * 0.5 * this._tileHeight;
 
                 // Create the tile
-                //this.getTile(leftPosition, topPosition);
                 this.addGrassTile(leftPosition, topPosition);
             }
         }
@@ -107,7 +106,7 @@ var VillageCreator = {
             // Cache once last grass tile added
             // The cursor might alseo be loaded,
             // so this could be off by one.
-            if (_this._gameCanvas.getObjects().length === _this._mapWidth * _this._mapHeight) {
+            if (_this._gameCanvas.getObjects().length === _this._mapWidth * _this._mapHeight - 1) {
                 _this.cacheLand();
             }
         });

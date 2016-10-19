@@ -157,9 +157,9 @@ var CursorFabric = {
         this._cursor.setCoords();
     },
 
-    uncreatePath: function () {
+    uncreatePath: function (KeyCode) {
 
-        if (event.which === 27) {
+        if (KeyCode === 27) {
             var stepObj = this.pathSteps[0];
             this._xCursorIndex = stepObj.xStepIndex;
             this._yCursorIndex = stepObj.yStepIndex;
