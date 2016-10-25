@@ -48,6 +48,11 @@ namespace SignalRApp.Hubs
             PlayerManager.Move(Context.ConnectionId, xStepIndex, yStepIndex);
         }
 
+        public void GetRemotePlayerDisplayInfo(string remoteConnectionId)
+        {
+            PlayerManager.RemoteDisplayInfo(remoteConnectionId, Context.ConnectionId);
+        }
+
         public void SendMessageToAll(string message)
         {
             string senderName = PlayerManager.GetName(Context.ConnectionId);

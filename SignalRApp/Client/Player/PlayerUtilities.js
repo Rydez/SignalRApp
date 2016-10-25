@@ -21,13 +21,20 @@ var PlayerUtilities = {
         for (var i = 0; i < structObjs.length; i++) {
             if (playerObj.intersectsWithObject(structObjs[i]) ||
                 playerObj.isContainedWithinObject(structObjs[i])) {
+
+                var zIndexOfStruct = this._gameCanvas.getObjects().indexOf(structObjs[i]);
+
                 // Determine to bring player forward, or send backward.
                 var playerDepth = this.calculatePlayerDepth(playerObj, structObjs[i]);
                 if (playerDepth === 'inFront') {
-                    this._gameCanvas.bringToFront(playerObj);
+
+                    // Put player below top object
+                    playerObj.moveTo(zIndexOfStruct + 1);
+                    return;
                 }
                 else {
-                    this._gameCanvas.bringToFront(structObjs[i]);
+                    playerObj.moveTo(zIndexOfStruct);
+                    return;
                 }
             }
         }

@@ -12,7 +12,7 @@ var Chat = {
         const constMinOpacity = 0.1;
         this.constMinOpacity = constMinOpacity;
 
-        this.maxOpacity = 0.6;
+        this.maxOpacity = 0.5;
         this.minOpacity = 0.1;
 
         var _this = this;
@@ -97,21 +97,32 @@ var Chat = {
     sendMessageToAll: function (KeyCode) {
         if (KeyCode === 13) {
             var message = $('#input-message').val();
-            this._gameProxy.server.sendMessageToAll(message);
+            if (message) {
+                this._gameProxy.server.sendMessageToAll(message);
 
-            // Clear input box
-            $('#input-message').val('').focus();
+                // Clear input box
+                $('#input-message').val('').focus();
+            }
+        }
+    },
+
+    unfocusChat: function (KeyCode) {
+
+        // 27 is key code for esc
+        if (KeyCode === 27) {
+            document.getElementById('input-message').blur();
+            document.getElementById('game-canvas').focus();
         }
     },
 
     fadeIn: function () {
         $('#chat-area').fadeTo(100, this.maxOpacity);
-        $('#input-message').fadeTo(100, this.maxOpacity);
+        //$('#input-message').fadeTo(100, this.maxOpacity);
     },
 
     fadeOut: function () {
         $('#chat-area').fadeTo(100, this.minOpacity);
-        $('#input-message').fadeTo(100, this.minOpacity);
+        //$('#input-message').fadeTo(100, this.minOpacity);
     },
 
     focusOnByChatArea: function () {

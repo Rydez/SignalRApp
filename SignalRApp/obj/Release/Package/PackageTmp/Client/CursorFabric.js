@@ -159,7 +159,8 @@ var CursorFabric = {
 
     uncreatePath: function (KeyCode) {
 
-        if (KeyCode === 27) {
+        // 27 is key code for esc
+        if (KeyCode === 27 && this.pathSteps.length !== 0) {
             var stepObj = this.pathSteps[0];
             this._xCursorIndex = stepObj.xStepIndex;
             this._yCursorIndex = stepObj.yStepIndex;

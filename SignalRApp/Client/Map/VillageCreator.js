@@ -6,7 +6,10 @@ var VillageCreator = {
                 this._gameCanvas = gameCanvas;
         
         this.structureObjects = [];
+        this.villageBackground;
 
+        this.numberOfGrassTiles = 0;
+        
         // In units of tiles
         this._mapWidth = gameConstants.mapWidth;
         this._mapHeight = gameConstants.mapHeight;
@@ -91,22 +94,23 @@ var VillageCreator = {
         var tile = new fabric.Path('M 0 20 L 40 0 L 80 20 L 40 40 z');
         tile.set({ left: leftPosition, top: topPosition, fill: rgbColor });
         this._gameCanvas.add(tile);
-        //return tile;
     },
 
     addGrassTile: function (leftPosition, topPosition) {
         var _this = this;
         var grassTile = new fabric.Image.fromURL('Client/images/grass_tile.png', function (img) {
             var grassTileImage = img.set({
+                id: 'grassTile',
                 left: leftPosition,
                 top: topPosition
             });
             _this._gameCanvas.add(grassTileImage);
             grassTileImage.selectable = false;
-            // Cache once last grass tile added
-            // The cursor might alseo be loaded,
-            // so this could be off by one.
-            if (_this._gameCanvas.getObjects().length === _this._mapWidth * _this._mapHeight - 1) {
+
+            _this.numberOfGrassTiles += 1;
+
+            // Cache on last grass tile
+            if (_this.numberOfGrassTiles === _this._mapWidth * _this._mapHeight) {
                 _this.cacheLand();
             }
         });
@@ -151,6 +155,7 @@ var VillageCreator = {
             });
             _this.villageBackground = landImg;
             _this._gameCanvas.add(_this.villageBackground);
+            //_this.villageBackground.moveTo(0);
             _this.villageBackground.selectable = false;
         });
     },

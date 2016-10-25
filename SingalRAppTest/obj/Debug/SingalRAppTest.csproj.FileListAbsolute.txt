@@ -38,3 +38,5 @@ C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SingalRAppTest\bin\Debug\Microsof
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SingalRAppTest\bin\Debug\Microsoft.Owin.Host.SystemWeb.xml
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SingalRAppTest\bin\Debug\Microsoft.Owin.Security.xml
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SingalRAppTest\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SingalRAppTest\bin\Debug\SingalRAppTest.dll.CodeAnalysisLog.xml
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SingalRAppTest\bin\Debug\SingalRAppTest.dll.lastcodeanalysissucceeded

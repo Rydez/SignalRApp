@@ -30,17 +30,32 @@ namespace SignalRApp.Server
         {
             Player newPlayer;
             IdPlayerPairs.TryGetValue(connectionId, out newPlayer);
-            // Add new player to remotes clients
-            _context.Clients.AllExcept(connectionId).addPlayerToRoom(connectionId, newPlayer.name, newPlayer.xPos, newPlayer.yPos);
 
+            bool isLocalPlayer = false;
+
+            // Add new player to remotes clients
+            _context.Clients.AllExcept(connectionId).addPlayerToRoom(isLocalPlayer, 
+                connectionId, newPlayer.name, newPlayer.xPos, newPlayer.yPos,
+                newPlayer.level, newPlayer.gold, newPlayer.health, newPlayer.mana);
         }
 
         public void AddPlayersToClient(string connectionId)
         {
+            bool isLocalPlayer = false;
+
             // Add players to new client
             foreach (Player player in IdPlayerPairs.Values)
             {
-                _context.Clients.Client(connectionId).addPlayerToRoom(player.ConnectionId, player.name, player.xPos, player.yPos);
+
+                // Check if local player is adding self
+                if(connectionId == player.ConnectionId)
+                {
+                    isLocalPlayer = true;
+                }
+                _context.Clients.Client(connectionId).addPlayerToRoom(isLocalPlayer,
+                    player.ConnectionId, player.name, player.xPos, player.yPos, 
+                    player.level, player.gold, player.health, player.mana);
+                isLocalPlayer = false;
             }
         }
 
@@ -85,13 +100,21 @@ namespace SignalRApp.Server
             _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
         }
 
-        public void StartingPosition()
+        public void RemoteDisplayInfo(string remoteConnectionId, string localConnectionId)
         {
-            // Add players to new client
-            foreach (Player player in IdPlayerPairs.Values)
+            Player selectedPlayer;
+            IdPlayerPairs.TryGetValue(remoteConnectionId, out selectedPlayer);
+
+
+            // Check if local player is adding self
+            bool isLocalPlayer = false;
+            if (remoteConnectionId == localConnectionId)
             {
-                
+                isLocalPlayer = true;
             }
+            _context.Clients.Client(localConnectionId).createRemotePlayerDisplay(isLocalPlayer,
+                       selectedPlayer.ConnectionId, selectedPlayer.name, selectedPlayer.level,
+                       selectedPlayer.gold, selectedPlayer.health, selectedPlayer.mana);
         }
     }
 }

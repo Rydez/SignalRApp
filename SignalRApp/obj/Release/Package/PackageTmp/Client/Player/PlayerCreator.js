@@ -1,10 +1,15 @@
 ﻿
 var PlayerCreator = {
     initialize: function (gameCanvas, structureObjects,
-                          canvasDimensions, gameConstants) {
+                          canvasDimensions, gameConstants,
+                          playerDisplay) {
 
         this.playerUtilities = Object.create(PlayerUtilities);
         this.playerUtilities.initialize(gameCanvas, structureObjects, gameConstants);
+
+        this.playerDisplay = playerDisplay;
+
+        this.localDisplayCreated = false;
 
         this._gameCanvas = gameCanvas;
 
@@ -12,6 +17,8 @@ var PlayerCreator = {
 
         this.mapLeftShift = 0;
         this.mapTopShift = 0;
+
+        this.playerSprite;
     },
 
     syncWithMap: function (shifts) {
@@ -19,7 +26,7 @@ var PlayerCreator = {
         this.mapTopShift = shifts.top;
     },
 
-    createPlayerSprite: function (id, name, xPos, yPos) {
+    createPlayer: function (isLocalPlayer, id, name, xPos, yPos, level, gold, health, mana) {
         var _this = this;
         var playerImage = new fabric.Image.fromURL('Client/images/stick-player.png', function (img) {
         
@@ -47,8 +54,16 @@ var PlayerCreator = {
             _this._playerSprite = playerFabricGroup;
             _this._gameCanvas.add(_this._playerSprite);
             _this._playerSprite.selectable = false;
+            _this._playerSprite.moveTo(2);
             _this.playerUtilities.handleStructureCollision(_this._playerSprite,
                     _this._structureObjects, _this._gameCanvas);
+
+            if (isLocalPlayer && !_this.localDisplayCreated) {
+                var isSecondary = false;
+                _this.playerDisplay.createPlayerDisplay(isLocalPlayer, id, name, level,
+                                                 gold, health, mana, isSecondary);
+                _this.localDisplayCreated = true;
+            }
         });
     },
 

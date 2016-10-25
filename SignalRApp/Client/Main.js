@@ -43,6 +43,32 @@ $(function () {
         canvasManager.getCanvas().renderAll();
         $('#main-container').css('display', 'block');
 
+        // Handle mouse clicks
+        canvasManager.getCanvas().on('mouse:up', function (event) {
+            var objId = event.target.id;
+
+            if (objId.indexOf('PlayerDisplay') !== -1) {
+                player.playerDisplay.addPlayerDisplayOptions(objId, event);
+            }
+            else {
+
+                // Remove pre existing player display before adding new one
+                player.playerDisplay.removeRemotePlayerDisplay();
+                player.playerDisplay.addRemotePlayerDisplay(objId);
+            }
+        });
+
+        // Handle mouse hover out
+        canvasManager.getCanvas().on('mouse:out', function (event) {
+            player.playerDisplay.unhighlightInviteOption(event);
+        });
+
+        // Handle mouse hover in
+        canvasManager.getCanvas().on('mouse:over', function (event) {
+            player.playerDisplay.removePlayerDisplayOptions(event);
+            player.playerDisplay.highlightInviteOption(event);
+        });
+
         // Handle resizing the window and canvas
         $(window).resize(function () {
             canvasManager.resizeCanvas();
@@ -51,12 +77,14 @@ $(function () {
             player.playerController.syncWithWindow(canvasManager.getDimensions());
         });
 
+        // Handle key downs
         $(document).keydown(function (event) {
 
             // check if player is chatting
             var isChatting = chat.checkPlayerChatting();
             if (isChatting) {
                 chat.sendMessageToAll(event.which);
+                chat.unfocusChat(event.which);
             }
             else {
                 map.mapController.controlMap(event.which);
@@ -69,6 +97,7 @@ $(function () {
             cursorFabric.syncWithMap(mapShifts);
             player.playerController.syncWithMap(mapShifts);
             player.playerCreator.syncWithMap(mapShifts);
+            player.playerDisplay.syncWithMap(mapShifts);
 
             var pathSteps = cursorFabric.getPathSteps();
             player.playerController.syncWithCursor(pathSteps);

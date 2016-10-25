@@ -18,17 +18,13 @@ var CanvasManager = {
         this._canvasPixelHeight;
 
         // Indices to determine starting pos
-        this.xStartIndex = 6;
+        this.xStartIndex = 9;
         this.yStartIndex = 0;
 
         // Reference the canvas
         this.gameCanvas = new fabric.Canvas('game-canvas');
 
         this.setCanvasProperties();
-
-        this.gameCanvas.on('mouse:up', function (event) {
-            console.log(event);
-        });
     },
 
     getCanvas: function () {

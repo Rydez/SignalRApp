@@ -3,8 +3,8 @@ var Structures = {
     structureInfo: [
             {
                 name: 'stable',
-                xIndex: 6,
-                yIndex: -5,
+                xIndex: 10,
+                yIndex: -8,
                 width: 240,
                 height: 190,
                 xOffSet: -8,

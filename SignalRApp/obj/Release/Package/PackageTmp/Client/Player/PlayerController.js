@@ -104,5 +104,4 @@ var PlayerController = {
             }
         });
     }
-
 };

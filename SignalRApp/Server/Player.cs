@@ -25,6 +25,10 @@ namespace SignalRApp.Server
         public int TILE_WIDTH { get; set; }
         public int TILE_HEIGHT { get; set; }
 
+        public int level { get; set; }
+        public int gold { get; set; }
+        public int health { get; set; }
+        public int mana { get; set; }
 
         // Constructor
         public Player()
@@ -35,11 +39,16 @@ namespace SignalRApp.Server
             TILE_WIDTH = 80;
             TILE_HEIGHT = 40;
 
-            xIndex = 6;
+            xIndex = 9;
             yIndex = 0;
 
             xPos = X_OFF_SET + 0.5 * TILE_WIDTH * (xIndex + yIndex);
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
+
+            level = 10;
+            gold = 1000;
+            health = 100;
+            mana = 100;
         }
 
         public void goToNextStep(double xStepIndex, double yStepIndex)
