@@ -97,8 +97,7 @@ var PlayerController = {
 
                 // Handle when the player is behind or
                 // in front of a structure
-                _this.playerUtilities.handleStructureCollision(obj, _this._structureObjects,
-                        _this._gameCanvas);
+                _this.playerUtilities.handleStructureCollision(obj, _this._structureObjects);
 
                 _this._gameCanvas.renderAll();
             }

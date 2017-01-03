@@ -1,9 +1,12 @@
-﻿using System;
+﻿
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
 using System.Collections.Concurrent;
+using MySql.Data.MySqlClient;
 
 namespace SignalRApp.Server
 {
@@ -19,11 +22,51 @@ namespace SignalRApp.Server
         }
 
         // Create a player for new client, and add remote players
-        public void InitializePlayer(string connectionId)
+        public void InitializePlayer(string connectionId, string name)
         {
+            string connString = System.Configuration.ConfigurationManager.ConnectionStrings["WebAppConnString"].ToString();
+            MySqlConnection conn = new MySqlConnection(connString);
+
+            int gold = 0;
+            int health = 0;
+            int mana = 0;
+            int level = 0;
+            
+            try
+            {
+                conn.Open();
+                string cmdText = "SELECT gold, health, mana, level FROM user WHERE name = @name";
+                MySqlCommand cmd = new MySqlCommand(cmdText, conn);
+                cmd.Parameters.AddWithValue("@name", name);
+
+                MySqlDataReader infoReader = cmd.ExecuteReader();
+                while (infoReader.Read())
+                {
+                    gold = infoReader.GetInt16("gold");
+                    health = infoReader.GetInt16("health");
+                    mana = infoReader.GetInt16("mana");
+                    level = infoReader.GetInt16("level");
+                }
+                cmd.Dispose();
+                conn.Close();
+            }
+            catch (MySqlException exception)
+            {
+                throw exception;
+            }
+
             // Create player
-            Player newPlayer = new Player() { ConnectionId = connectionId };
+            Player newPlayer = new Player() {
+                ConnectionId = connectionId,
+                name = name,
+                gold = gold,
+                health = health,
+                mana = mana,
+                level = level
+            };
             IdPlayerPairs.TryAdd(connectionId, newPlayer);
+
+            _context.Clients.Client(connectionId).startGame();
         }
 
         public void AddClientToRemotePlayers(string connectionId)
@@ -70,13 +113,16 @@ namespace SignalRApp.Server
             _context.Clients.All.removePlayerFromRoom(disconnectedPlayer.ConnectionId);
         }
 
-        public void SetName(string name, string connectionId)
-        {
-            Player unnamedPlayer;
-            IdPlayerPairs.TryGetValue(connectionId, out unnamedPlayer);
+        //public void Register(string name, string password, string repeatedPassword, 
+        //                     string connectionId)
+        //{
+        //    //Player unnamedPlayer;
+        //    //IdPlayerPairs.TryGetValue(connectionId, out unnamedPlayer);
 
-            unnamedPlayer.name = name;
-        }
+        //    //unnamedPlayer.name = name;
+
+        //    unnamedPlayer.dbNameInsert(name);
+        //}
 
         public string GetName(string connectionId)
         {

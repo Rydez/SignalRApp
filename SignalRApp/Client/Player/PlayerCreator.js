@@ -18,7 +18,7 @@ var PlayerCreator = {
         this.mapLeftShift = 0;
         this.mapTopShift = 0;
 
-        this.playerSprite;
+        //this.playerSprite;
     },
 
     syncWithMap: function (shifts) {
@@ -51,12 +51,12 @@ var PlayerCreator = {
                 top: _this.mapTopShift + yPos
             });
 
-            _this._playerSprite = playerFabricGroup;
-            _this._gameCanvas.add(_this._playerSprite);
-            _this._playerSprite.selectable = false;
-            _this._playerSprite.moveTo(2);
-            _this.playerUtilities.handleStructureCollision(_this._playerSprite,
-                    _this._structureObjects, _this._gameCanvas);
+            //_this._playerSprite = playerFabricGroup;
+            _this._gameCanvas.add(playerFabricGroup);
+            playerFabricGroup.selectable = false;
+            playerFabricGroup.moveTo(2);
+            _this.playerUtilities.handleStructureCollision(playerFabricGroup,
+                    _this._structureObjects);
 
             if (isLocalPlayer && !_this.localDisplayCreated) {
                 var isSecondary = false;

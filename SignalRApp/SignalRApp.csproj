@@ -108,6 +108,7 @@
       <HintPath>..\packages\Moq.4.5.22\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -138,12 +139,15 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Client\Account.js" />
     <Content Include="Client\CanvasManager.js" />
     <Content Include="Client\Chat.js" />
     <Content Include="Client\Common\FabricUtilities.js" />
+    <Content Include="Client\css\account.css" />
     <Content Include="Client\css\index.css" />
     <Content Include="Client\CursorFabric.js" />
     <Content Include="Client\GameConstants.js" />
+    <Content Include="Client\Game.js" />
     <Content Include="Client\images\archery_range.png" />
     <Content Include="Client\images\barracks.png" />
     <Content Include="Client\images\blacksmith.png" />
@@ -186,22 +190,33 @@
     <Content Include="Scripts\ai.0.15.0-build58334.js" />
     <Content Include="Scripts\ai.0.15.0-build58334.min.js" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="jasmine-2.5.2\boot.js" />
     <Content Include="Scripts\fabric.js" />
     <Content Include="Scripts\fabric.min.js" />
+    <Content Include="jasmine-2.5.2\jasmine-html.js" />
+    <Content Include="jasmine-2.5.2\jasmine.css" />
+    <Content Include="jasmine-2.5.2\jasmine.js" />
+    <Content Include="jasmine-2.5.2\jasmine_favicon.png" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
     <Content Include="Scripts\jquery.signalR-2.2.1.js" />
     <Content Include="Scripts\jquery.signalR-2.2.1.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="specRunner.html" />
+    <Content Include="Specs\VillageCreatorSpec.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hubs\GameHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\AccountManager.cs" />
     <Compile Include="Server\ChatManager.cs" />
     <Compile Include="Server\Player.cs" />
     <Compile Include="Server\PlayerManager.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

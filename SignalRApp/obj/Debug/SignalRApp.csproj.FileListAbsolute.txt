@@ -51,3 +51,4 @@ C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\Castle.Core.xml
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\Moq.xml
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\nunit.framework.xml
 C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\obj\Debug\SignalRApp.csprojResolveAssemblyReference.cache
+C:\Users\Ryan Melendez\Source\Repos\SignalRApp\SignalRApp\bin\MySql.Data.xml

@@ -19,11 +19,12 @@ var PlayerDisplay = {
     },
 
     syncWithMap: function (shifts) {
-
-        this.localPlayerDisplay.set({
-            left: this.leftLocalDisplayMargin,
-            top: this.topLocalDisplayMargin
-        });
+        if (this.localPlayerDisplay) {
+            this.localPlayerDisplay.set({
+                left: this.leftLocalDisplayMargin,
+                top: this.topLocalDisplayMargin
+            });
+        }
 
         if (this.remotePlayerDisplay) {
             this.remotePlayerDisplay.set({

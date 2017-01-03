@@ -1,6 +1,28 @@
 ﻿
 
+
+
 $(function () {
+
+    //var allImageNames = [
+    //    'archery_range.png',
+    //    'barracks.png',
+    //    'blacksmith.png',
+    //    'grass_tile.png',
+    //    'house1.png',
+    //    'house1b.png',
+    //    'house1c.png',
+    //    'pine-none08.png',
+    //    'player_display.png',
+    //    'stable.png',
+    //    'stick-player.png'
+    //];
+    //var allImages = {};
+
+    //for (var i = 0; i < allImages.length; i++) {
+    //    allImages[allImageNames[i]] = new Image();
+    //    allImages[allImageNames[i]].src = allImageNames[i];
+    //}
 
     // Declare a proxy to reference the hub.
     var gameProxy = $.connection.gameHub;
@@ -37,8 +59,11 @@ $(function () {
         // Sync The new client with other clients
         gameProxy.server.syncPlayers();
 
+        //TODO VERY IMPORTANT// !!!!!!!!!!!!!!!!!!!!
+        // Background can be moved to back before everything is loaded...
+
         // Set z indices, render, and show
-        map.villageCreator.villageBackground.moveTo(0);
+        //map.villageCreator.villageBackground.moveTo(0);
         cursorFabric._cursor.moveTo(1);
         canvasManager.getCanvas().renderAll();
         $('#main-container').css('display', 'block');

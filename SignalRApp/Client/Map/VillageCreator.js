@@ -3,7 +3,7 @@
 var VillageCreator = {
 
     initialize: function (gameCanvas, canvasDimensions, gameConstants) {
-                this._gameCanvas = gameCanvas;
+        this._gameCanvas = gameCanvas;
         
         this.structureObjects = [];
         this.villageBackground;
@@ -28,7 +28,6 @@ var VillageCreator = {
     createMap: function () {
         this.createLand();
         this.createStructures();
-        //this._gameCanvas.renderAll();
     },
 
     createLand: function () {
@@ -99,21 +98,25 @@ var VillageCreator = {
     addGrassTile: function (leftPosition, topPosition) {
         var _this = this;
         var grassTile = new fabric.Image.fromURL('Client/images/grass_tile.png', function (img) {
-            var grassTileImage = img.set({
-                id: 'grassTile',
-                left: leftPosition,
-                top: topPosition
-            });
-            _this._gameCanvas.add(grassTileImage);
-            grassTileImage.selectable = false;
-
-            _this.numberOfGrassTiles += 1;
-
-            // Cache on last grass tile
-            if (_this.numberOfGrassTiles === _this._mapWidth * _this._mapHeight) {
-                _this.cacheLand();
-            }
+            _this.setupGrassTile(img, leftPosition, topPosition);
         });
+    },
+
+    setupGrassTile: function (img, leftPosition, topPosition) {
+        var grassTileImage = img.set({
+            id: 'grassTile',
+            left: leftPosition,
+            top: topPosition
+        });
+        this._gameCanvas.add(grassTileImage);
+        grassTileImage.selectable = false;
+
+        this.numberOfGrassTiles += 1;
+
+        // Cache on last grass tile
+        if (this.numberOfGrassTiles === this._mapWidth * this._mapHeight) {
+            this.cacheLand();
+        }
     },
 
     structureTemplate: function (name, xIndex, yIndex, width, height, xOffSet, yOffSet) {
@@ -155,7 +158,7 @@ var VillageCreator = {
             });
             _this.villageBackground = landImg;
             _this._gameCanvas.add(_this.villageBackground);
-            //_this.villageBackground.moveTo(0);
+            _this.villageBackground.moveTo(0);
             _this.villageBackground.selectable = false;
         });
     },

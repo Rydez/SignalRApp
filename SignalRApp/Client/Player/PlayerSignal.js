@@ -2,12 +2,12 @@
 var PlayerSignal = {
 
     // Initialize functions for server to call
-    initialize: function (gameProxy, playerFabric, playerController, playerDisplay) {
+    initialize: function (gameProxy, playerCreator, playerController, playerDisplay) {
 
         // Create player
         gameProxy.client.addPlayerToRoom = function (isLocalPlayer, id, name, xPos, yPos, level,
                                                      gold, health, mana) {
-            playerFabric.createPlayer(isLocalPlayer, id, name, xPos, yPos, level, gold,
+            playerCreator.createPlayer(isLocalPlayer, id, name, xPos, yPos, level, gold,
                                       health, mana);
         };
 
@@ -20,7 +20,7 @@ var PlayerSignal = {
 
         // Remove player
         gameProxy.client.removePlayerFromRoom = function (id) {
-            playerFabric.removePlayerSprite(id);
+            playerCreator.removePlayerSprite(id);
         };
 
         // Move player

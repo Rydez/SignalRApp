@@ -12,9 +12,9 @@ var PlayerUtilities = {
         this._tileHeight = gameConstants.tileHeight;
     },
 
-    handleStructureCollision: function (playerObj) {
+    handleStructureCollision: function (playerObj, structObjs) {
 
-        var structObjs = this._structureObjects;
+        //var structObjs = this._structureObjects;
 
         // Loop through structures to find if the player
         // is within a structure or intersecting with it
@@ -33,7 +33,7 @@ var PlayerUtilities = {
                     return;
                 }
                 else {
-                    playerObj.moveTo(zIndexOfStruct);
+                    playerObj.moveTo(zIndexOfStruct - 1);
                     return;
                 }
             }

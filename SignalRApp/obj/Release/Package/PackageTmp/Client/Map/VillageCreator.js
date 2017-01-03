@@ -155,7 +155,7 @@ var VillageCreator = {
             });
             _this.villageBackground = landImg;
             _this._gameCanvas.add(_this.villageBackground);
-            //_this.villageBackground.moveTo(0);
+            _this.villageBackground.moveTo(0);
             _this.villageBackground.selectable = false;
         });
     },

@@ -11,18 +11,18 @@ namespace SignalRApp.Hubs
 {
     public class GameHub : Hub
     {
-        // Create a PlayerManager
+        public AccountManager AccountManager = new AccountManager();
+        
         public PlayerManager PlayerManager = new PlayerManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
-
-        // Create a ChatManager
+        
         public ChatManager ChatManager = new ChatManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
 
-        // Function executed when client connects
-        public override Task OnConnected()
-        {
-            PlayerManager.InitializePlayer(Context.ConnectionId);
-            return base.OnConnected();
-        }
+        //// Function executed when client connects
+        //public override Task OnConnected()
+        //{
+        //    PlayerManager.InitializePlayer(Context.ConnectionId);
+        //    return base.OnConnected();
+        //}
 
         // Function executed when client disconnects
         public override Task OnDisconnected(bool stopCalled)
@@ -31,9 +31,28 @@ namespace SignalRApp.Hubs
             return base.OnDisconnected(stopCalled);
         }
 
-        public void NamePlayer(string name)
+        public void LoginPlayer(string name, string password)
         {
-            PlayerManager.SetName(name, Context.ConnectionId);
+            if (AccountManager.Login(name, password) == "success")
+            {
+                PlayerManager.InitializePlayer(Context.ConnectionId, name);
+            }
+            else
+            {
+                Console.WriteLine("FAILZORZ");
+            }
+        }
+
+        public void RegisterPlayer(string name, string password)
+        {
+            if (AccountManager.Register(name, password) == "success")
+            {
+                PlayerManager.InitializePlayer(Context.ConnectionId, name);
+            }
+            else
+            {
+                Console.WriteLine("FAILZORZ");
+            }
         }
 
         public void SyncPlayers()

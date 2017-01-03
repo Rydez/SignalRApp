@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -44,11 +46,6 @@ namespace SignalRApp.Server
 
             xPos = X_OFF_SET + 0.5 * TILE_WIDTH * (xIndex + yIndex);
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
-
-            level = 10;
-            gold = 1000;
-            health = 100;
-            mana = 100;
         }
 
         public void goToNextStep(double xStepIndex, double yStepIndex)
@@ -58,5 +55,19 @@ namespace SignalRApp.Server
             xPos = X_OFF_SET + 0.5 * TILE_WIDTH * (xIndex + yIndex);
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }
+
+        //public void dbNameInsert (string name)
+        //{
+        //    string connString = System.Configuration.ConfigurationManager.ConnectionStrings["WebAppConnString"].ToString();
+        //    MySqlConnection conn = new MySqlConnection(connString);
+
+        //    conn.Open();
+        //    string cmdText = "INSERT INTO user (name) VALUES (@name)";
+        //    MySqlCommand cmd = new MySqlCommand(cmdText, conn);
+        //    cmd.Parameters.AddWithValue("@name", name);
+        //    cmd.ExecuteNonQuery();
+        //    cmd.Dispose();
+        //    conn.Close();
+        //}
     }
 }
