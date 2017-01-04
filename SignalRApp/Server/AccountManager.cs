@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Web;
+using Microsoft.AspNet.SignalR;
 
 namespace SignalRApp.Server
 {
@@ -14,12 +15,47 @@ namespace SignalRApp.Server
 
     public class AccountManager
     {
+        private readonly IHubContext _context;
+
+        public AccountManager(IHubContext context)
+        {
+            _context = context;
+        }
 
         //TODO: Put initial gold, health, mana, etc. into some constants file
         private int gold = 10;
         private int health = 10;
         private int mana = 10;
         private int level = 1;
+
+
+        public string AttemptLogin(string connectionId, string name, string password)
+        {
+            string response = Login(name, password);
+            if (response == "success")
+            {
+                return "success";
+            }
+            else
+            {
+                _context.Clients.Client(connectionId).accountError(response);
+            }
+            return "fail";
+        }
+
+        public string AttemptRegistration(string connectionId, string name, string password)
+        {
+            string response = Register(name, password);
+            if (response == "success")
+            {
+                return "success";
+            }
+            else
+            {
+                _context.Clients.Client(connectionId).accountError(response);
+            }
+            return "fail";
+        }
 
         public string Login(string name, string password)
         {
@@ -40,12 +76,18 @@ namespace SignalRApp.Server
                 {
                     passwordHash = passwordReader.GetString(0);
                 }
+
+                if (string.IsNullOrEmpty(passwordHash))
+                {
+                    return "Incorrect username";
+                }
+
                 cmd.Dispose();
                 conn.Close();
             }
             catch (MySqlException exception)
             {
-                throw exception;
+                return exception.Number.ToString();
             }
 
 
@@ -61,7 +103,7 @@ namespace SignalRApp.Server
             {
                 if (hashBytes[i + 16] != hash[i])
                 {
-                    return "fail";
+                    return "incorrect password";
                 }
             }
 

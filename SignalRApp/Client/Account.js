@@ -23,6 +23,18 @@ var Account = {
             _this.switchToLogin();
         });
 
+        // Lone signal function
+        gameProxy.client.accountError = function (errorMessage) {
+            var loginContainer = document.getElementById('login-container');
+            var loginStyle = window.getComputedStyle(loginContainer);
+            var loginDisplay = loginStyle.getPropertyValue('display');
+            if (loginDisplay === 'none') {
+                document.getElementById('registration-error-message-span').innerHTML = 'Message from database: ' + errorMessage;
+            }
+            else {
+                document.getElementById('login-error-message-span').innerHTML = 'Message from database: ' + errorMessage;
+            }
+        }
     },
 
     submitLogin: function () {
@@ -37,9 +49,15 @@ var Account = {
     },
 
     submitRegistration: function () {
-        this.gameProxy.server.registerPlayer(
-            document.getElementById('registration-username-input').value,
-            document.getElementById('registration-password-input').value);
+        var username = document.getElementById('registration-username-input').value;
+        var password = document.getElementById('registration-password-input').value;
+        var repeatedPassword = document.getElementById('registration-repeat-password-input').value;
+        if (password === repeatedPassword) {
+            this.gameProxy.server.registerPlayer(username, password);
+        }
+        else {
+            document.getElementById('registration-error-message-span').innerHTML = 'Passwords do not match';
+        }
     },
 
     switchToLogin: function () {

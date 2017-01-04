@@ -9,20 +9,16 @@ using System.Collections.Generic;
 
 namespace SignalRApp.Hubs
 {
+
+    // TODO: When this file becomes to larger, consider breaking GameHub into 
+    // separate hubs which inherit from Hub
     public class GameHub : Hub
     {
-        public AccountManager AccountManager = new AccountManager();
+        public AccountManager AccountManager = new AccountManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
         
         public PlayerManager PlayerManager = new PlayerManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
         
         public ChatManager ChatManager = new ChatManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
-
-        //// Function executed when client connects
-        //public override Task OnConnected()
-        //{
-        //    PlayerManager.InitializePlayer(Context.ConnectionId);
-        //    return base.OnConnected();
-        //}
 
         // Function executed when client disconnects
         public override Task OnDisconnected(bool stopCalled)
@@ -33,25 +29,19 @@ namespace SignalRApp.Hubs
 
         public void LoginPlayer(string name, string password)
         {
-            if (AccountManager.Login(name, password) == "success")
+            string response = AccountManager.AttemptLogin(Context.ConnectionId, name, password);
+            if (response == "success")
             {
                 PlayerManager.InitializePlayer(Context.ConnectionId, name);
-            }
-            else
-            {
-                Console.WriteLine("FAILZORZ");
             }
         }
 
         public void RegisterPlayer(string name, string password)
         {
-            if (AccountManager.Register(name, password) == "success")
+            string response = AccountManager.AttemptRegistration(Context.ConnectionId, name, password);
+            if (response == "success")
             {
                 PlayerManager.InitializePlayer(Context.ConnectionId, name);
-            }
-            else
-            {
-                Console.WriteLine("FAILZORZ");
             }
         }
 
