@@ -14,6 +14,9 @@ namespace SignalRApp.Server
 
         public string name { get; set; }
 
+        public string partyName { get; set; }
+        public string pendingPartyName { get; set; }
+
         public double xIndex { get; set; }
         public double yIndex { get; set; }
 
@@ -55,19 +58,5 @@ namespace SignalRApp.Server
             xPos = X_OFF_SET + 0.5 * TILE_WIDTH * (xIndex + yIndex);
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }
-
-        //public void dbNameInsert (string name)
-        //{
-        //    string connString = System.Configuration.ConfigurationManager.ConnectionStrings["WebAppConnString"].ToString();
-        //    MySqlConnection conn = new MySqlConnection(connString);
-
-        //    conn.Open();
-        //    string cmdText = "INSERT INTO user (name) VALUES (@name)";
-        //    MySqlCommand cmd = new MySqlCommand(cmdText, conn);
-        //    cmd.Parameters.AddWithValue("@name", name);
-        //    cmd.ExecuteNonQuery();
-        //    cmd.Dispose();
-        //    conn.Close();
-        //}
     }
 }

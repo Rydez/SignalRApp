@@ -27,6 +27,9 @@ var Game = {
         this.chat = Object.create(Chat);
         this.chat.initialize(this.gameProxy);
 
+        this.party = Object.create(Party);
+        this.party.initialize(this.gameProxy, this.canvasManager, this.canvasManager.getCanvas());
+
         // Lone signal function
         var _this = this;
         gameProxy.client.startGame = function () {
@@ -55,7 +58,10 @@ var Game = {
         $('#main-container').css('display', 'block');
 
         // Hide account container
-        $('#account-container').css('display', 'block');
+        $('#account-container').css('display', 'none');
+
+        // Hide registration container
+        $('#registration-container').css('display', 'none');
     },
 
     mouseBindings: function () {
@@ -65,14 +71,33 @@ var Game = {
         this.canvasManager.getCanvas().on('mouse:up', function (event) {
             var objId = event.target.id;
 
-            if (objId.indexOf('PlayerDisplay') !== -1) {
-                _this.player.playerDisplay.addPlayerDisplayOptions(objId, event);
-            }
-            else {
+            if (objId) {
+                if (objId.indexOf('PlayerDisplay') !== -1) {
+                    _this.player.playerDisplay.addPlayerDisplayOptions(objId, event);
+                }
+                else if (objId.indexOf('inviteOption') !== -1) {
+                    _this.gameProxy.server.invitePlayer(objId.split(':')[1]);
+                }
+                else if (objId.indexOf('leaveOption') !== -1) {
+                    _this.gameProxy.server.leaveParty();
+                }
+                else if (objId.indexOf('playerInPartyConfirmation') !== -1) {
+                    _this.party.removePlayerInPartyResponse();
+                }
+                else if (objId.indexOf('acceptInvitation') !== -1) {
+                    _this.gameProxy.server.acceptInvitation();
+                    _this.party.removeInvitation();
+                }
+                else if (objId.indexOf('rejectInvitation') !== -1) {
+                    _this.gameProxy.server.rejectInvitation();
+                    _this.party.removeInvitation();
+                }
+                else {
 
-                // Remove pre existing player display before adding new one
-                _this.player.playerDisplay.removeRemotePlayerDisplay();
-                _this.player.playerDisplay.addRemotePlayerDisplay(objId);
+                    // Remove pre existing player display before adding new one
+                    _this.player.playerDisplay.removeRemotePlayerDisplay();
+                    _this.player.playerDisplay.addRemotePlayerDisplay(objId);
+                }
             }
         });
 
@@ -112,6 +137,7 @@ var Game = {
             _this.player.playerController.syncWithMap(mapShifts);
             _this.player.playerCreator.syncWithMap(mapShifts);
             _this.player.playerDisplay.syncWithMap(mapShifts);
+            _this.party.syncWithMap(mapShifts);
 
             var pathSteps = _this.cursorFabric.getPathSteps();
             _this.player.playerController.syncWithCursor(pathSteps);

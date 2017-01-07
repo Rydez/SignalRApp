@@ -28,7 +28,6 @@ var PlayerController = {
     },
 
     syncWithCursor: function (pathSteps) {
-
         this.pathSteps = pathSteps;
     },
 

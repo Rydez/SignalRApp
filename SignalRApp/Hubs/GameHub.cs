@@ -67,5 +67,25 @@ namespace SignalRApp.Hubs
             string senderName = PlayerManager.GetName(Context.ConnectionId);
             ChatManager.SendToAll(Context.ConnectionId, senderName, message);
         }
+
+        public void InvitePlayer(string playerToInviteId)
+        {
+            PlayerManager.InvitePlayerToParty(Context.ConnectionId, playerToInviteId);
+        }
+
+        public void AcceptInvitation()
+        {
+            PlayerManager.AcceptInvitation(Context.ConnectionId);
+        }
+
+        public void RejectInvitation()
+        {
+            PlayerManager.RejectInvitation(Context.ConnectionId);
+        }
+
+        public void LeaveParty()
+        {
+            PlayerManager.LeaveParty(Context.ConnectionId);
+        }
     }
 }

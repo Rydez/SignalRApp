@@ -70,7 +70,7 @@ var PlayerCreator = {
     removePlayerSprite: function (id) {
         var _this = this;
         _this._gameCanvas.forEachObject(function (obj) {
-            if (obj.id && obj.id === id) {
+            if (obj && obj.id && obj.id === id) {
                 _this._gameCanvas.remove(obj);
                 _this._gameCanvas.renderAll();
             }

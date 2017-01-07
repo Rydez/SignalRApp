@@ -161,6 +161,7 @@
     <Content Include="Client\images\stick-player.png" />
     <Content Include="Client\Map\MapController.js" />
     <Content Include="Client\Map\Map.js" />
+    <Content Include="Client\Party.js" />
     <Content Include="Client\Player\PlayerController.js" />
     <Content Include="Client\Player\PlayerCreator.js" />
     <Content Include="Client\Player\Player.js" />

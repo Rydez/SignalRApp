@@ -1,6 +1,9 @@
 ﻿
 
 var PlayerDisplay = {
+
+    // TODO: Awful lot of magic numbers in here. Create a constants section
+
     initialize: function (gameCanvas, gameProxy) {
         this._gameCanvas = gameCanvas;
         this._gameProxy = gameProxy;
@@ -13,7 +16,7 @@ var PlayerDisplay = {
         this.localPlayerDisplay;
         this.remotePlayerDisplay;
         this.displayOptions;
-        this.inviteOption;
+        this.options;
 
 
     },
@@ -51,56 +54,79 @@ var PlayerDisplay = {
         var objType = objId.split(':')[0];
         var associatedPlayerId = objId.split(':')[1];
 
-        if (objType === 'remotePlayerDisplay') {
+        if (objType === 'remotePlayerDisplay' || objType === 'localPlayerDisplay') {
+
+            var optionObj = {};
+            if (objType === 'remotePlayerDisplay') {
+                optionObj.text = 'Invite to party';
+                optionObj.id = 'inviteOption:' + associatedPlayerId;
+            }
+            else if (objType === 'localPlayerDisplay') {
+                optionObj.text = 'Leave party';
+                optionObj.id = 'leaveOption:' + associatedPlayerId;
+            }
+
             var displayOptions = new fabric.Rect({
                 id: 'displayOptions',
-                left: event.e.x - 20,
-                top: event.e.y - 20,
+                left: event.e.x - 130,
+                top: event.e.y - 10,
                 width: 110,
                 height: 50,
                 fill: 'rgba(10, 10, 10, 0.8)'
             });
 
-            var inviteOption = new fabric.Text('Invite to group', {
-                id: 'inviteOption',
+            var options = new fabric.Text(optionObj.text, {
+                id: optionObj.id,
                 fontSize: 15,
                 fill: 'rgba(255, 255, 255, 0.5)',
-                left: event.e.x - 10,
-                top: event.e.y - 15
+                left: event.e.x - 120,
+                top: event.e.y - 5
             });
 
-            this.inviteOption = inviteOption;
+            this.options = options;
             this.displayOptions = displayOptions;
 
             this._gameCanvas.add(this.displayOptions);
-            this._gameCanvas.add(this.inviteOption);
+            this._gameCanvas.add(this.options);
 
             this.displayOptions.selectable = false;
-            this.inviteOption.selectable = false;
+            this.options.selectable = false;
 
             this.displayOptions.bringToFront();
-            this.inviteOption.bringToFront();
+            this.options.bringToFront();
         }
     },
 
     removePlayerDisplayOptions: function (event) {
-        if (event.target && event.target.id !== 'displayOptions' &&
-                            event.target.id !== 'inviteOption') {
+        if (!event.target.id) {
             this._gameCanvas.remove(this.displayOptions)
-            this._gameCanvas.remove(this.inviteOption);
+            this._gameCanvas.remove(this.options);
+            this._gameCanvas.renderAll();
+        }
+        else if (event.target.id !== 'displayOptions' &&
+                 event.target.id.indexOf('inviteOption') === -1 &&
+                 event.target.id.indexOf('leaveOption') === -1) {
+            this._gameCanvas.remove(this.displayOptions)
+            this._gameCanvas.remove(this.options);
             this._gameCanvas.renderAll();
         }
     },
 
     highlightInviteOption: function (event) {
-        if (event.target && event.target.id === 'inviteOption') {
+        if (event.target && event.target.id &&
+            (event.target.id.indexOf('inviteOption') !== -1 ||
+            event.target.id.indexOf('leaveOption') !== -1)) {
+
             event.target.setFill('rgba(255, 255, 255, 0.9)');
             this._gameCanvas.renderAll();
         }
     },
 
     unhighlightInviteOption: function (event) {
-        if (event.target && event.target.id === 'inviteOption') {
+        if (event.target && event.target.id &&
+            (event.target.id.indexOf('inviteOption') !== -1 ||
+            event.target.id.indexOf('leaveOption') !== -1)) {
+
             event.target.setFill('rgba(255, 255, 255, 0.5)');
             this._gameCanvas.renderAll();
         }

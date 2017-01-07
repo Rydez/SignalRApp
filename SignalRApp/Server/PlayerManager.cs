@@ -16,6 +16,17 @@ namespace SignalRApp.Server
 
         public static ConcurrentDictionary<string, Player> IdPlayerPairs = new ConcurrentDictionary<string, Player>();
 
+        private static Dictionary<string, List<string>> GroupIdAndListOfPlayerIds = new Dictionary<string, List<string>>();
+
+        struct PartyMemberInfo
+        {
+            public string id;
+            public string name;
+            public int level;
+            public int health;
+            public int mana;
+        };
+
         public PlayerManager(IHubContext context)
         {
             _context = context;
@@ -113,17 +124,6 @@ namespace SignalRApp.Server
             _context.Clients.All.removePlayerFromRoom(disconnectedPlayer.ConnectionId);
         }
 
-        //public void Register(string name, string password, string repeatedPassword, 
-        //                     string connectionId)
-        //{
-        //    //Player unnamedPlayer;
-        //    //IdPlayerPairs.TryGetValue(connectionId, out unnamedPlayer);
-
-        //    //unnamedPlayer.name = name;
-
-        //    unnamedPlayer.dbNameInsert(name);
-        //}
-
         public string GetName(string connectionId)
         {
             Player namedPlayer;
@@ -161,6 +161,118 @@ namespace SignalRApp.Server
             _context.Clients.Client(localConnectionId).createRemotePlayerDisplay(isLocalPlayer,
                        selectedPlayer.ConnectionId, selectedPlayer.name, selectedPlayer.level,
                        selectedPlayer.gold, selectedPlayer.health, selectedPlayer.mana);
+        }
+
+        public void InvitePlayerToParty(string connectionId, string playerToInviteId)
+        {
+            Player playerInvited;
+            IdPlayerPairs.TryGetValue(playerToInviteId, out playerInvited);
+
+            Player playerInviter;
+            IdPlayerPairs.TryGetValue(connectionId, out playerInviter);
+
+            string partyName;
+
+            // Determine if the inviter is already in a group
+            if (string.IsNullOrEmpty(playerInviter.partyName))
+            {
+                List<string> playerIds = new List<string>();
+                playerIds.Add(connectionId);
+                partyName = "party:" + playerInviter.ConnectionId;
+                playerInviter.partyName = partyName;
+                GroupIdAndListOfPlayerIds.Add(partyName, playerIds);
+                _context.Groups.Add(connectionId, partyName);
+            }
+            else
+            {
+                partyName = playerInviter.partyName;
+            }
+
+            // Return that player is already in group if the player has a 
+            // partyName and that party contains more 1 player
+            if (!string.IsNullOrEmpty(playerInvited.partyName) && 
+                GroupIdAndListOfPlayerIds[playerInvited.partyName].Count > 1)
+            {
+                _context.Clients.Client(connectionId).playerIsAlreadyInAParty();
+            }
+            else
+            {
+                playerInvited.pendingPartyName = partyName;
+                _context.Clients.Client(playerToInviteId).invitePlayerToParty(playerInviter.name);
+            }
+        }
+
+        public void AcceptInvitation(string connectionId)
+        {
+            Player playerInvited;
+            IdPlayerPairs.TryGetValue(connectionId, out playerInvited);
+            
+            if (!string.IsNullOrEmpty(playerInvited.partyName))
+            {
+                GroupIdAndListOfPlayerIds.Remove(playerInvited.partyName);
+            }
+
+            playerInvited.partyName = playerInvited.pendingPartyName;
+            _context.Groups.Add(connectionId, playerInvited.pendingPartyName);
+
+            PartyMemberInfo newPartyMember;
+            newPartyMember.level = playerInvited.level;
+            newPartyMember.health = playerInvited.health;
+            newPartyMember.mana = playerInvited.mana;
+            newPartyMember.name = playerInvited.name;
+            newPartyMember.id = playerInvited.ConnectionId;
+
+            List<PartyMemberInfo> partyMembers = new List<PartyMemberInfo>();
+            for (int i = 0; i < GroupIdAndListOfPlayerIds[playerInvited.pendingPartyName].Count; i++)
+            {
+                Player partyMember;
+                IdPlayerPairs.TryGetValue(GroupIdAndListOfPlayerIds[playerInvited.pendingPartyName][i], out partyMember);
+
+                PartyMemberInfo partyMemberInfo = new PartyMemberInfo();
+                partyMemberInfo.level = partyMember.level;
+                partyMemberInfo.health = partyMember.health;
+                partyMemberInfo.mana = partyMember.mana;
+                partyMemberInfo.name = partyMember.name;
+                partyMemberInfo.id = partyMember.ConnectionId;
+                partyMembers.Add(partyMemberInfo);
+            }
+
+            _context.Clients.Client(connectionId).addPartyMembersToNewMember(partyMembers);
+            _context.Clients.Group(playerInvited.partyName, connectionId).addNewMemberToPartyMembers(newPartyMember);
+
+            GroupIdAndListOfPlayerIds[playerInvited.pendingPartyName].Add(connectionId);
+            playerInvited.pendingPartyName = "";
+        }
+
+        public void RejectInvitation(string connectionId)
+        {
+            Player playerInvited;
+            IdPlayerPairs.TryGetValue(connectionId, out playerInvited);
+
+            playerInvited.pendingPartyName = "";
+        }
+
+        public void LeaveParty(string connectionId)
+        {
+            Player leavingPlayer;
+            IdPlayerPairs.TryGetValue(connectionId, out leavingPlayer);
+
+            _context.Clients.Client(connectionId).removePartyMembersFromLeavingMember();
+            _context.Clients.Group(leavingPlayer.partyName, connectionId).removeLeavingMemberFromPartyMembers(connectionId);
+
+            GroupIdAndListOfPlayerIds[leavingPlayer.partyName].Remove(connectionId);
+
+            // If after leaving there is only one player left, then disband the party
+            if (GroupIdAndListOfPlayerIds[leavingPlayer.partyName].Count == 1)
+            {
+                Player lastPlayerInParty;
+                IdPlayerPairs.TryGetValue(GroupIdAndListOfPlayerIds[leavingPlayer.partyName][0], out lastPlayerInParty);
+
+                lastPlayerInParty.partyName = "";
+                GroupIdAndListOfPlayerIds.Remove(leavingPlayer.partyName);
+            }
+
+            leavingPlayer.partyName = "";
         }
     }
 }
