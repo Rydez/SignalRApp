@@ -17,6 +17,8 @@ namespace SignalRApp.Server
         public string partyName { get; set; }
         public string pendingPartyName { get; set; }
 
+        public bool isReadyForWilderness { get; set; }
+
         public double xIndex { get; set; }
         public double yIndex { get; set; }
 
@@ -38,6 +40,8 @@ namespace SignalRApp.Server
         // Constructor
         public Player()
         {
+            isReadyForWilderness = false;
+
             X_OFF_SET = 40;
             Y_OFF_SET = 7;
 

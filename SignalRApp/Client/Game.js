@@ -19,6 +19,10 @@ var Game = {
                 this.gameConstants, this.map.villageCreator.getStructureObjects(),
                 this.canvasManager.getDimensions());
 
+        this.structureMenuManager = Object.create(StructureMenuManager);
+        this.structureMenuManager.initialize(gameProxy, this.canvasManager,
+                this.map.villageCreator.getStructureObjects());
+
         this.cursorFabric = Object.create(CursorFabric);
         this.cursorFabric.initialize(this.canvasManager.getCanvas(), this.gameConstants,
                 this.map.villageCreator.getStructureIndices(),
@@ -39,7 +43,8 @@ var Game = {
 
     start: function () {
 
-        // Sync The new client with other clients
+        // Sync The new client with other clients 
+        // (Really starts creation of all players)
         this.gameProxy.server.syncPlayers();
 
         this.mouseBindings();
@@ -92,6 +97,9 @@ var Game = {
                     _this.gameProxy.server.rejectInvitation();
                     _this.party.removeInvitation();
                 }
+                else if (objId.indexOf('notReadyConfirmation') !== -1) {
+                    _this.structureMenuManager.wildernessMenu.removeNotReadyResponse();
+                }
                 else {
 
                     // Remove pre existing player display before adding new one
@@ -130,6 +138,7 @@ var Game = {
                 _this.cursorFabric.uncreatePath(event.which);
                 _this.cursorFabric.moveCursor(event.which);
                 _this.player.playerController.controlPlayer(event.which, _this.cursorFabric);
+                _this.structureMenuManager.promptMenu(event.which, _this.player.playerCreator.playerSprite);
             }
 
             var mapShifts = _this.map.mapController.getMapShifts();

@@ -87,5 +87,10 @@ namespace SignalRApp.Hubs
         {
             PlayerManager.LeaveParty(Context.ConnectionId);
         }
+
+        public void CheckWildernessReadiness()
+        {
+            PlayerManager.CheckWildernessReadiness(Context.ConnectionId);
+        }
     }
 }

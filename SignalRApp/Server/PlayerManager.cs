@@ -16,7 +16,9 @@ namespace SignalRApp.Server
 
         public static ConcurrentDictionary<string, Player> IdPlayerPairs = new ConcurrentDictionary<string, Player>();
 
-        private static Dictionary<string, List<string>> GroupIdAndListOfPlayerIds = new Dictionary<string, List<string>>();
+        private static Dictionary<string, List<string>> PartyNameAndListOfPlayerIds = new Dictionary<string, List<string>>();
+
+        private static Dictionary<string, string> PendingPartyNameAndPlayerId = new Dictionary<string, string>();
 
         struct PartyMemberInfo
         {
@@ -32,7 +34,7 @@ namespace SignalRApp.Server
             _context = context;
         }
 
-        // Create a player for new client, and add remote players
+        // Get info ready to start game for client
         public void InitializePlayer(string connectionId, string name)
         {
             string connString = System.Configuration.ConfigurationManager.ConnectionStrings["WebAppConnString"].ToString();
@@ -174,24 +176,30 @@ namespace SignalRApp.Server
             string partyName;
 
             // Determine if the inviter is already in a group
-            if (string.IsNullOrEmpty(playerInviter.partyName))
+            if (string.IsNullOrEmpty(playerInviter.partyName) && string.IsNullOrEmpty(playerInviter.pendingPartyName))
             {
-                List<string> playerIds = new List<string>();
-                playerIds.Add(connectionId);
                 partyName = "party:" + playerInviter.ConnectionId;
-                playerInviter.partyName = partyName;
-                GroupIdAndListOfPlayerIds.Add(partyName, playerIds);
-                _context.Groups.Add(connectionId, partyName);
+                playerInviter.pendingPartyName = partyName;
+                PendingPartyNameAndPlayerId.Add(partyName, connectionId);
             }
             else
             {
-                partyName = playerInviter.partyName;
+                if (!string.IsNullOrEmpty(playerInviter.partyName))
+                {
+                    partyName = playerInviter.partyName;
+                }
+                else
+                {
+                    partyName = playerInviter.pendingPartyName;
+                }
             }
 
             // Return that player is already in group if the player has a 
-            // partyName and that party contains more 1 player
-            if (!string.IsNullOrEmpty(playerInvited.partyName) && 
-                GroupIdAndListOfPlayerIds[playerInvited.partyName].Count > 1)
+            // partyName and that party contains more 1 player, or if the player
+            // is still deciding to join a different party
+            if ((!string.IsNullOrEmpty(playerInvited.partyName) && 
+                PartyNameAndListOfPlayerIds[playerInvited.partyName].Count > 1) ||
+                !string.IsNullOrEmpty(playerInvited.pendingPartyName))
             {
                 _context.Clients.Client(connectionId).playerIsAlreadyInAParty();
             }
@@ -206,15 +214,32 @@ namespace SignalRApp.Server
         {
             Player playerInvited;
             IdPlayerPairs.TryGetValue(connectionId, out playerInvited);
-            
-            if (!string.IsNullOrEmpty(playerInvited.partyName))
+
+            // If the inviter was not in a group, then switch inviter to no longer pending party
+            if (PendingPartyNameAndPlayerId.ContainsKey(playerInvited.pendingPartyName))
             {
-                GroupIdAndListOfPlayerIds.Remove(playerInvited.partyName);
+                Player playerInviter;
+                IdPlayerPairs.TryGetValue(PendingPartyNameAndPlayerId[playerInvited.pendingPartyName], out playerInviter);
+
+                playerInviter.partyName = playerInviter.pendingPartyName;
+                PendingPartyNameAndPlayerId.Remove(playerInviter.pendingPartyName);
+                playerInviter.pendingPartyName = "";
+
+                List<string> playerIds = new List<string>();
+                playerIds.Add(playerInviter.ConnectionId);
+                PartyNameAndListOfPlayerIds.Add(playerInviter.partyName, playerIds);
+
+                _context.Groups.Add(playerInviter.ConnectionId, playerInviter.partyName);
             }
 
-            playerInvited.partyName = playerInvited.pendingPartyName;
-            _context.Groups.Add(connectionId, playerInvited.pendingPartyName);
 
+            // Switch invited to no longer be pending party
+            playerInvited.partyName = playerInvited.pendingPartyName;
+            playerInvited.pendingPartyName = "";
+            
+            _context.Groups.Add(connectionId, playerInvited.partyName);
+
+            // Get new member info for pre existing members
             PartyMemberInfo newPartyMember;
             newPartyMember.level = playerInvited.level;
             newPartyMember.health = playerInvited.health;
@@ -222,11 +247,12 @@ namespace SignalRApp.Server
             newPartyMember.name = playerInvited.name;
             newPartyMember.id = playerInvited.ConnectionId;
 
+            // Get pre existing member info for new member
             List<PartyMemberInfo> partyMembers = new List<PartyMemberInfo>();
-            for (int i = 0; i < GroupIdAndListOfPlayerIds[playerInvited.pendingPartyName].Count; i++)
+            for (int i = 0; i < PartyNameAndListOfPlayerIds[playerInvited.partyName].Count; i++)
             {
                 Player partyMember;
-                IdPlayerPairs.TryGetValue(GroupIdAndListOfPlayerIds[playerInvited.pendingPartyName][i], out partyMember);
+                IdPlayerPairs.TryGetValue(PartyNameAndListOfPlayerIds[playerInvited.partyName][i], out partyMember);
 
                 PartyMemberInfo partyMemberInfo = new PartyMemberInfo();
                 partyMemberInfo.level = partyMember.level;
@@ -240,14 +266,24 @@ namespace SignalRApp.Server
             _context.Clients.Client(connectionId).addPartyMembersToNewMember(partyMembers);
             _context.Clients.Group(playerInvited.partyName, connectionId).addNewMemberToPartyMembers(newPartyMember);
 
-            GroupIdAndListOfPlayerIds[playerInvited.pendingPartyName].Add(connectionId);
-            playerInvited.pendingPartyName = "";
+            // Add after list of all party members is sent to client
+            PartyNameAndListOfPlayerIds[playerInvited.partyName].Add(connectionId);
         }
 
         public void RejectInvitation(string connectionId)
         {
             Player playerInvited;
             IdPlayerPairs.TryGetValue(connectionId, out playerInvited);
+
+            // If the inviter was not in a group, then switch inviter to no longer pending party
+            if (PendingPartyNameAndPlayerId.ContainsKey(playerInvited.pendingPartyName))
+            {
+                Player playerInviter;
+                IdPlayerPairs.TryGetValue(PendingPartyNameAndPlayerId[playerInvited.pendingPartyName], out playerInviter);
+                
+                PendingPartyNameAndPlayerId.Remove(playerInviter.pendingPartyName);
+                playerInviter.pendingPartyName = "";
+            }
 
             playerInvited.pendingPartyName = "";
         }
@@ -260,19 +296,58 @@ namespace SignalRApp.Server
             _context.Clients.Client(connectionId).removePartyMembersFromLeavingMember();
             _context.Clients.Group(leavingPlayer.partyName, connectionId).removeLeavingMemberFromPartyMembers(connectionId);
 
-            GroupIdAndListOfPlayerIds[leavingPlayer.partyName].Remove(connectionId);
+            PartyNameAndListOfPlayerIds[leavingPlayer.partyName].Remove(connectionId);
 
             // If after leaving there is only one player left, then disband the party
-            if (GroupIdAndListOfPlayerIds[leavingPlayer.partyName].Count == 1)
+            if (PartyNameAndListOfPlayerIds[leavingPlayer.partyName].Count == 1)
             {
                 Player lastPlayerInParty;
-                IdPlayerPairs.TryGetValue(GroupIdAndListOfPlayerIds[leavingPlayer.partyName][0], out lastPlayerInParty);
+                IdPlayerPairs.TryGetValue(PartyNameAndListOfPlayerIds[leavingPlayer.partyName][0], out lastPlayerInParty);
 
                 lastPlayerInParty.partyName = "";
-                GroupIdAndListOfPlayerIds.Remove(leavingPlayer.partyName);
+                PartyNameAndListOfPlayerIds.Remove(leavingPlayer.partyName);
             }
 
             leavingPlayer.partyName = "";
+        }
+
+        public void CheckWildernessReadiness(string connectionId)
+        {
+            Player enteringPlayer;
+            IdPlayerPairs.TryGetValue(connectionId, out enteringPlayer);
+
+            if (string.IsNullOrEmpty(enteringPlayer.partyName) && 
+                string.IsNullOrEmpty(enteringPlayer.pendingPartyName))
+            {
+                _context.Clients.Client(connectionId).enterWildernessConfirmation();
+                return;
+            }
+            else if (!string.IsNullOrEmpty(enteringPlayer.pendingPartyName))
+            {
+                string notReadyStatus = "pendingParty";
+                _context.Clients.Client(connectionId).notReadyForWilderness(notReadyStatus);
+                return;
+            }
+            else
+            {
+                List<string> memberIds = PartyNameAndListOfPlayerIds[enteringPlayer.partyName];
+
+                // Check if all members are ready
+                for (int i = 0; i < memberIds.Count; i++)
+                {
+                    Player member;
+                    IdPlayerPairs.TryGetValue(memberIds[i], out member);
+
+                    if (!member.isReadyForWilderness)
+                    {
+                        string notReadyStatus = "memberNotReady";
+                        _context.Clients.Client(connectionId).notReadyForWilderness(notReadyStatus);
+                        return;
+                    }
+                }
+
+                _context.Clients.Client(connectionId).enterWildernessConfirmation();
+            }
         }
     }
 }

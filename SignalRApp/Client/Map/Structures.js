@@ -57,6 +57,14 @@ var Structures = {
                 height: 123,
                 xOffSet: -8,
                 yOffSet: 8
+            }, {
+                name: 'mountain1',
+                xIndex: 60,
+                yIndex: -15,
+                width: 240,
+                height: 200,
+                xOffSet: -8,
+                yOffSet: 8
             }
     ]
 };

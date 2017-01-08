@@ -27,21 +27,21 @@ var Party = {
         // TODO: put these in a PartySignal file
         gameProxy.client.invitePlayerToParty = function (nameOfInviter) {
             _this.createInvitation(nameOfInviter);
-        }
-
+        };
+        
         gameProxy.client.playerIsAlreadyInAParty = function () {
             _this.createPlayerInPartyResponse();
-        }
+        };
 
         gameProxy.client.addPartyMembersToNewMember = function (partyMembers) {
             for (var i = 0; i < partyMembers.length; i++) {
                 _this.createMemberDisplay(partyMembers[i]);
             }
-        }
+        };
 
         gameProxy.client.addNewMemberToPartyMembers = function (newPartyMember) {
             _this.createMemberDisplay(newPartyMember);
-        }
+        };
 
         gameProxy.client.removePartyMembersFromLeavingMember = function () {
             for (var i = 0; i < _this.memberDisplayGroups.length; i++) {
@@ -49,7 +49,7 @@ var Party = {
             }
             _this._gameCanvas.renderAll();
             _this.memberDisplayGroups = [];
-        }
+        };
 
         gameProxy.client.removeLeavingMemberFromPartyMembers = function (leavingMemberId) {
             for (var i = 0; i < _this.memberDisplayGroups.length; i++) {
@@ -59,7 +59,7 @@ var Party = {
                 }
             }
             _this._gameCanvas.renderAll();
-        }
+        };
     },
 
     syncWithMap: function (shifts) {

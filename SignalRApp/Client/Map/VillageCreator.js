@@ -33,6 +33,7 @@ var VillageCreator = {
     createLand: function () {
         for (var i = 0; i < this._mapHeight; i++) {
             for (var j = 0; j < this._mapWidth; j++) {
+
                 // Off set every other row
                 var xOffSet = (i % 2 === 0) ? 0 : 0.5 * this._tileWidth;
 
@@ -53,6 +54,7 @@ var VillageCreator = {
         structureInfo = structures.structureInfo;
 
         for (var i = 0; i < structureInfo.length; i++) {
+
             // 's' is shorthand for structureInfo[i]
             var s = structureInfo[i];
             this.structureTemplate(s.name, s.xIndex, s.yIndex,
@@ -125,6 +127,7 @@ var VillageCreator = {
 
             // Set lower left corner of image to tile indices   
             var structureImage = img.set({
+                id: name,
                 left: xOffSet + 0.5 * _this._tileWidth * (xIndex + yIndex),
                 top: yOffSet + 0.5 * _this._tileHeight * (xIndex - yIndex) - height
             });

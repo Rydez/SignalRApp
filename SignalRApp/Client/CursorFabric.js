@@ -83,6 +83,7 @@ var CursorFabric = {
             opacity: 0.7
         });
         this._cursor = cursor;
+        this._cursor.selectable = false;
         this._gameCanvas.add(this._cursor);
     },
 

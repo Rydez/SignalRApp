@@ -155,12 +155,14 @@
     <Content Include="Client\images\house1.png" />
     <Content Include="Client\images\house1b.png" />
     <Content Include="Client\images\house1c.png" />
+    <Content Include="Client\images\mountain1.png" />
     <Content Include="Client\images\pine-none08.png" />
     <Content Include="Client\images\player_display.png" />
     <Content Include="Client\images\stable.png" />
     <Content Include="Client\images\stick-player.png" />
     <Content Include="Client\Map\MapController.js" />
     <Content Include="Client\Map\Map.js" />
+    <Content Include="Client\StructureMenuManager.js" />
     <Content Include="Client\Party.js" />
     <Content Include="Client\Player\PlayerController.js" />
     <Content Include="Client\Player\PlayerCreator.js" />
@@ -169,6 +171,7 @@
     <Content Include="Client\Map\VillageCreator.js" />
     <Content Include="Client\Player\PlayerDisplay.js" />
     <Content Include="Client\Player\PlayerUtilities.js" />
+    <Content Include="Client\WildernessMenu.js" />
     <Content Include="packages.config" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
