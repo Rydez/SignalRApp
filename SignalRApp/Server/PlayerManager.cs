@@ -27,6 +27,7 @@ namespace SignalRApp.Server
             public int level;
             public int health;
             public int mana;
+            public bool isReadyForWilderness;
         };
 
         public PlayerManager(IHubContext context)
@@ -230,6 +231,7 @@ namespace SignalRApp.Server
                 PartyNameAndListOfPlayerIds.Add(playerInviter.partyName, playerIds);
 
                 _context.Groups.Add(playerInviter.ConnectionId, playerInviter.partyName);
+                _context.Clients.Client(playerInviter.ConnectionId).addReadyOptionForNewMember();
             }
 
 
@@ -246,6 +248,7 @@ namespace SignalRApp.Server
             newPartyMember.mana = playerInvited.mana;
             newPartyMember.name = playerInvited.name;
             newPartyMember.id = playerInvited.ConnectionId;
+            newPartyMember.isReadyForWilderness = playerInvited.isReadyForWilderness;
 
             // Get pre existing member info for new member
             List<PartyMemberInfo> partyMembers = new List<PartyMemberInfo>();
@@ -260,10 +263,12 @@ namespace SignalRApp.Server
                 partyMemberInfo.mana = partyMember.mana;
                 partyMemberInfo.name = partyMember.name;
                 partyMemberInfo.id = partyMember.ConnectionId;
+                partyMemberInfo.isReadyForWilderness = partyMember.isReadyForWilderness;
                 partyMembers.Add(partyMemberInfo);
             }
 
             _context.Clients.Client(connectionId).addPartyMembersToNewMember(partyMembers);
+            _context.Clients.Client(connectionId).addReadyOptionForNewMember();
             _context.Clients.Group(playerInvited.partyName, connectionId).addNewMemberToPartyMembers(newPartyMember);
 
             // Add after list of all party members is sent to client
@@ -294,6 +299,7 @@ namespace SignalRApp.Server
             IdPlayerPairs.TryGetValue(connectionId, out leavingPlayer);
 
             _context.Clients.Client(connectionId).removePartyMembersFromLeavingMember();
+            _context.Clients.Client(connectionId).removeLeavingMemberReadyCheck();
             _context.Clients.Group(leavingPlayer.partyName, connectionId).removeLeavingMemberFromPartyMembers(connectionId);
 
             PartyNameAndListOfPlayerIds[leavingPlayer.partyName].Remove(connectionId);
@@ -348,6 +354,26 @@ namespace SignalRApp.Server
 
                 _context.Clients.Client(connectionId).enterWildernessConfirmation();
             }
+        }
+
+        public void ChangeReadyStatus(string connectionId)
+        {
+            Player statusChanger;
+            IdPlayerPairs.TryGetValue(connectionId, out statusChanger);
+
+            if (statusChanger.isReadyForWilderness)
+            {
+                statusChanger.isReadyForWilderness = false;
+            }
+            else
+            {
+                statusChanger.isReadyForWilderness = true;
+            }
+
+            _context.Clients.Client(connectionId).changeLocalPlayerReadiness(statusChanger.isReadyForWilderness);
+            _context.Clients.Group(statusChanger.partyName, connectionId).changeRemotePlayerReadiness(connectionId, 
+                                                                                                      statusChanger.isReadyForWilderness);
+
         }
     }
 }

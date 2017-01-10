@@ -92,5 +92,10 @@ namespace SignalRApp.Hubs
         {
             PlayerManager.CheckWildernessReadiness(Context.ConnectionId);
         }
+
+        public void ChangeReadyStatus()
+        {
+            PlayerManager.ChangeReadyStatus(Context.ConnectionId);
+        }
     }
 }

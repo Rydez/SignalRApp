@@ -20,6 +20,8 @@ var Party = {
         this.playerInPartyConfirmationButton;
         this.playerInPartyButtonText;
 
+        this.readyCheck;
+
         this.memberDisplayGroups = [];
 
         var _this = this;
@@ -39,6 +41,10 @@ var Party = {
             }
         };
 
+        gameProxy.client.addReadyOptionForNewMember = function () {
+            _this.createReadyCheck();
+        };
+
         gameProxy.client.addNewMemberToPartyMembers = function (newPartyMember) {
             _this.createMemberDisplay(newPartyMember);
         };
@@ -51,6 +57,10 @@ var Party = {
             _this.memberDisplayGroups = [];
         };
 
+        gameProxy.client.removeLeavingMemberReadyCheck = function () {
+            _this._gameCanvas.remove(_this.readyCheck.readyCheckGroup);
+        };
+
         gameProxy.client.removeLeavingMemberFromPartyMembers = function (leavingMemberId) {
             for (var i = 0; i < _this.memberDisplayGroups.length; i++) {
                 if (_this.memberDisplayGroups[i].memberDisplayGroup.id.split(':')[1] === leavingMemberId) {
@@ -59,6 +69,33 @@ var Party = {
                 }
             }
             _this._gameCanvas.renderAll();
+        };
+
+        gameProxy.client.changeLocalPlayerReadiness = function (isReadyForWilderness) {
+            var readinessColor = 'rgba(255, 0, 21, 1)';
+            if (isReadyForWilderness) {
+                readinessColor = 'rgba(2, 204, 18, 1)';
+            }
+            _this.readyCheck.readyCheckGroup.item(0).set({
+                fill: readinessColor
+            });
+            _this._gameCanvas.renderAll();
+        };
+
+        gameProxy.client.changeRemotePlayerReadiness = function (remotePlayerId, isReadyForWilderness) {
+            var readinessColor = 'rgba(255, 0, 21, 1)';
+            if (isReadyForWilderness) {
+                readinessColor = 'rgba(2, 204, 18, 1)';
+            }
+
+            for (var i = 0; i < _this.memberDisplayGroups.length; i++) {
+                if (_this.memberDisplayGroups[i].memberDisplayGroup.id.split(':')[1] = remotePlayerId) {
+                    _this.memberDisplayGroups[i].memberDisplayGroup.item(1).set({
+                        fill: readinessColor
+                    });
+                    _this._gameCanvas.renderAll();
+                }
+            }
         };
     },
 
@@ -69,9 +106,63 @@ var Party = {
                     left: this.memberDisplayGroups[i].leftDisplayMargin,
                     top: this.memberDisplayGroups[i].topDisplayMargin
                 });
+
+                this.readyCheck.readyCheckGroup.set({
+                    left: this.readyCheck.leftMargin,
+                    top: this.readyCheck.topMargin
+                });
             }
         }
         this._gameCanvas.renderAll();
+    },
+
+    createReadyCheck: function () {
+        var leftMargin = 25;
+        var topMargin = 130;
+
+        var readinessRectWidth = 15;
+        var readinessRectHeight = 15;
+
+        var readinessRect = new fabric.Rect({
+            left: 10,
+            top: 0,
+            width: readinessRectWidth,
+            height: readinessRectHeight,
+            fill: 'rgba(255, 0, 21, 1)'
+        });
+
+        var readinessText = new fabric.Text('Ready for The Wilderness?', {
+            fontSize: 16,
+            fill: 'white',
+            left: 30,
+            top: 0
+        });
+
+        var readyCheckGroup = new fabric.Group([readinessRect, readinessText], {
+            id: 'readyCheck',
+            left: leftMargin,
+            top: topMargin,
+        });
+
+        readyCheckGroup.setShadow({
+            color: 'rgba(0,0,0,0.6)',
+            blur: 10,
+            offsetX: 5,
+            offsetY: 5,
+            fillShadow: true,
+            strokeShadow: true
+        });
+
+        var readyCheck = {
+            readyCheckGroup: readyCheckGroup,
+            leftMargin: leftMargin,
+            topMargin: topMargin
+        };
+
+        this.readyCheck = readyCheck;
+        this._gameCanvas.add(readyCheckGroup);
+        readyCheckGroup.selectable = false;
+        readyCheckGroup.bringToFront();
     },
 
     createMemberDisplay: function (partyMember) {
@@ -79,7 +170,10 @@ var Party = {
         var memberDisplayWidth = 140;
         var memberDisplayHeight = 60;
 
-        var playerDisplayOffset = 150;
+        var readinessRectWidth = 15;
+        var readinessRectHeight = 15;
+
+        var playerDisplayOffset = 160;
 
         var memberDisplaySpacing = 10;
 
@@ -94,10 +188,23 @@ var Party = {
             fill: 'rgba(10, 10, 10, 0.8)'
         });
 
+        var readinessColor = 'rgba(255, 0, 21, 1)';
+        if (partyMember.isReadyForWilderness) {
+            readinessColor = 'rgba(2, 204, 18, 1)';
+        }
+
+        var readinessRect = new fabric.Rect({
+            left: 10,
+            top: 10,
+            width: readinessRectWidth,
+            height: readinessRectHeight,
+            fill: readinessColor
+        });
+
         var playerName = new fabric.Text(partyMember.name, {
             fontSize: 16,
             fill: 'white',
-            left: 10,
+            left: 30,
             top: 10
         });
 
@@ -124,7 +231,8 @@ var Party = {
             fill: 'rgba(37, 92, 140, 1)'
         });
 
-        var memberDisplayGroup = new fabric.Group([memberDisplayRect, playerName, playerLevel, healthBar, manaBar], {
+        var memberDisplayGroup = new fabric.Group([memberDisplayRect, readinessRect,
+                                                   playerName, playerLevel, healthBar, manaBar], {
             id: 'memberDisplay:' + partyMember.id,
             left: leftDisplayMargin,
             top: topDisplayMargin,

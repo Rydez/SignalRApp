@@ -97,6 +97,9 @@ var Game = {
                     _this.gameProxy.server.rejectInvitation();
                     _this.party.removeInvitation();
                 }
+                else if (objId.indexOf('readyCheck') !== -1) {
+                    _this.gameProxy.server.changeReadyStatus();
+                }
                 else if (objId.indexOf('notReadyConfirmation') !== -1) {
                     _this.structureMenuManager.wildernessMenu.removeNotReadyResponse();
                 }

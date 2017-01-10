@@ -1,6 +1,6 @@
 ﻿
 
-
+//TODO: Clean up the liberal use of renderAll() so that it's only used when necessary
 
 $(function () {
 
@@ -14,11 +14,5 @@ $(function () {
     account.initialize(this.gameProxy);
 
     // Start the connection
-    $.connection.hub.start().done(function () {
-
-        //TODO: remove this promise but keep start() I think
-
-        //game.start();
-
-    });
+    $.connection.hub.start();
 });
