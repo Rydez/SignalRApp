@@ -1,5 +1,9 @@
 ﻿
 var Structures = {
+
+    // Each structure should be square (N by N tiles).
+    // Oddly shaped structures should be broken into squares
+    // The width will be N * tileWidth
     structureInfo: [
             {
                 name: 'stable',

@@ -34,26 +34,34 @@ var Game = {
         this.party = Object.create(Party);
         this.party.initialize(this.gameProxy, this.canvasManager, this.canvasManager.getCanvas());
 
+        this.wilderness = Object.create(Wilderness);
+        this.wilderness.initialize(this.gameProxy, this.canvasManager.getCanvas(),
+                                   this.canvasManager.getDimensions(),
+                                   this.map.villageCreator.structureObjects,
+                                   this.map.villageCreator.villageBackground,
+                                   this.player.playerCreator.allPlayersOnCanvas,
+                                   this.gameConstants, this.cursorFabric._cursor);
+
         // Lone signal function
         var _this = this;
         gameProxy.client.startGame = function () {
-            _this.start();
+            _this.startGame();
         };
     },
 
-    start: function () {
+    startGame: function () {
 
         // Sync The new client with other clients 
         // (Really starts creation of all players)
-        this.gameProxy.server.syncPlayers();
+        this.gameProxy.server.addAllPlayers();
 
         this.mouseBindings();
         this.keyboardBindings();
         this.windowBindings();
-        this.show();
+        this.showGame();
     },
 
-    show: function () {
+    showGame: function () {
 
         // Set z indices, render, and show
         this.cursorFabric._cursor.moveTo(1);
@@ -102,6 +110,13 @@ var Game = {
                 }
                 else if (objId.indexOf('notReadyConfirmation') !== -1) {
                     _this.structureMenuManager.wildernessMenu.removeNotReadyResponse();
+                }
+                else if (objId.indexOf('enterWilderness') !== -1) {
+                    _this.wilderness.clearVillage();
+                    _this.gameProxy.server.createRandomWildernessItems();
+                }
+                else if (objId.indexOf('cancelWilderness') !== -1) {
+                    _this.structureMenuManager.wildernessMenu.removeEnterConfirmationResponse();
                 }
                 else {
 

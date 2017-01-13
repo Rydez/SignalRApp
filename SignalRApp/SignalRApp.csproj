@@ -160,6 +160,7 @@
     <Content Include="Client\images\player_display.png" />
     <Content Include="Client\images\stable.png" />
     <Content Include="Client\images\stick-player.png" />
+    <Content Include="Client\images\tree1.png" />
     <Content Include="Client\Map\MapController.js" />
     <Content Include="Client\Map\Map.js" />
     <Content Include="Client\StructureMenuManager.js" />
@@ -171,6 +172,7 @@
     <Content Include="Client\Map\VillageCreator.js" />
     <Content Include="Client\Player\PlayerDisplay.js" />
     <Content Include="Client\Player\PlayerUtilities.js" />
+    <Content Include="Client\Wilderness.js" />
     <Content Include="Client\WildernessMenu.js" />
     <Content Include="packages.config" />
     <Content Include="ApplicationInsights.config">
@@ -218,6 +220,8 @@
     <Compile Include="Server\ChatManager.cs" />
     <Compile Include="Server\Player.cs" />
     <Compile Include="Server\PlayerManager.cs" />
+    <Compile Include="Server\Wilderness.cs" />
+    <Compile Include="Server\WildernessStructure.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup />

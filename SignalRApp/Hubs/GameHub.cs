@@ -12,6 +12,10 @@ namespace SignalRApp.Hubs
 
     // TODO: When this file becomes to larger, consider breaking GameHub into 
     // separate hubs which inherit from Hub
+
+    // TODO: Add authorization attributes to the hub methods.
+    // Google SignalR security to figure it out.
+
     public class GameHub : Hub
     {
         public AccountManager AccountManager = new AccountManager(GlobalHost.ConnectionManager.GetHubContext<GameHub>());
@@ -45,10 +49,16 @@ namespace SignalRApp.Hubs
             }
         }
 
-        public void SyncPlayers()
+        public void AddAllPlayers()
         {
             PlayerManager.AddClientToRemotePlayers(Context.ConnectionId);
             PlayerManager.AddPlayersToClient(Context.ConnectionId);
+        }
+
+        public void AddPartyMembers()
+        {
+            PlayerManager.AddClientToPartyMembers(Context.ConnectionId);
+            PlayerManager.AddPartyMembersToClient(Context.ConnectionId);
         }
 
         // Function executed when on keydown
@@ -96,6 +106,14 @@ namespace SignalRApp.Hubs
         public void ChangeReadyStatus()
         {
             PlayerManager.ChangeReadyStatus(Context.ConnectionId);
+        }
+
+        public void CreateRandomWildernessItems()
+        {
+            Wilderness wilderness = new Wilderness();
+            string partyName = PlayerManager.GetPartyName(Context.ConnectionId);
+
+            Clients.Group(partyName).createWilderness(wilderness);
         }
     }
 }

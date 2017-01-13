@@ -89,7 +89,7 @@ var Party = {
             }
 
             for (var i = 0; i < _this.memberDisplayGroups.length; i++) {
-                if (_this.memberDisplayGroups[i].memberDisplayGroup.id.split(':')[1] = remotePlayerId) {
+                if (_this.memberDisplayGroups[i].memberDisplayGroup.id.split(':')[1] === remotePlayerId) {
                     _this.memberDisplayGroups[i].memberDisplayGroup.item(1).set({
                         fill: readinessColor
                     });
@@ -270,7 +270,7 @@ var Party = {
         var buttonWidth = 80;
         var buttonHeight = 40;
 
-        var responseMessage = nameOfInviter + 'wants to invite you to a party.'
+        var responseMessage = nameOfInviter + ' wants to invite you to a party.'
 
         var invitationRect = new fabric.Rect({
             left: canvasWidth / 2 - invitationRectWidth / 2,

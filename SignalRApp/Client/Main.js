@@ -2,6 +2,9 @@
 
 //TODO: Clean up the liberal use of renderAll() so that it's only used when necessary
 
+//TODO: Add reconnection handling for players in groups and in the wilderness.
+
+
 $(function () {
 
     // Declare a proxy to reference the hub.

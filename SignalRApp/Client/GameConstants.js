@@ -25,6 +25,10 @@ var GameConstants = {
     tileWidth: 80,
     tileHeight: 40,
 
+    // Upper left corner (or origin) of the tile from the center
+    xTileOrigin: -0.5 * this.tileWidth,
+    yTileOrigin: -0.5 * this.tileHeight,
+
     // Indices to determine starting pos
     xStartIndex: 9,
     yStartIndex: 0

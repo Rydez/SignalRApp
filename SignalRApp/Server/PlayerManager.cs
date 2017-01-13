@@ -96,6 +96,19 @@ namespace SignalRApp.Server
                 newPlayer.level, newPlayer.gold, newPlayer.health, newPlayer.mana);
         }
 
+        public void AddClientToPartyMembers(string connectionId)
+        {
+            Player clientPlayer;
+            IdPlayerPairs.TryGetValue(connectionId, out clientPlayer);
+
+            bool isLocalPlayer = false;
+
+            // Add new player to remotes clients
+            _context.Clients.Group(clientPlayer.partyName, connectionId).addPlayerToRoom(isLocalPlayer,
+                connectionId, clientPlayer.name, clientPlayer.xPos, clientPlayer.yPos,
+                clientPlayer.level, clientPlayer.gold, clientPlayer.health, clientPlayer.mana);
+        }
+
         public void AddPlayersToClient(string connectionId)
         {
             bool isLocalPlayer = false;
@@ -112,6 +125,37 @@ namespace SignalRApp.Server
                 _context.Clients.Client(connectionId).addPlayerToRoom(isLocalPlayer,
                     player.ConnectionId, player.name, player.xPos, player.yPos, 
                     player.level, player.gold, player.health, player.mana);
+
+                isLocalPlayer = false;
+            }
+        }
+
+        public void AddPartyMembersToClient(string connectionId)
+        {
+            Player clientPlayer;
+            IdPlayerPairs.TryGetValue(connectionId, out clientPlayer);
+
+            bool isLocalPlayer = false;
+
+            int numOfPartyMembers = PartyNameAndListOfPlayerIds[clientPlayer.partyName].Count;
+
+            // Add members to client
+            for (int i = 0; i < numOfPartyMembers; i++)
+            {
+                string memberId = PartyNameAndListOfPlayerIds[clientPlayer.partyName][i];
+
+                Player partyMember;
+                IdPlayerPairs.TryGetValue(memberId, out partyMember);
+
+                // Check if local player is adding self
+                if (memberId == partyMember.ConnectionId)
+                {
+                    isLocalPlayer = true;
+                }
+                _context.Clients.Client(connectionId).addPlayerToRoom(isLocalPlayer,
+                    partyMember.ConnectionId, partyMember.name, partyMember.xPos, partyMember.yPos,
+                    partyMember.level, partyMember.gold, partyMember.health, partyMember.mana);
+
                 isLocalPlayer = false;
             }
         }
@@ -374,6 +418,14 @@ namespace SignalRApp.Server
             _context.Clients.Group(statusChanger.partyName, connectionId).changeRemotePlayerReadiness(connectionId, 
                                                                                                       statusChanger.isReadyForWilderness);
 
+        }
+
+        public string GetPartyName(string connectionId)
+        {
+            Player partyMember;
+            IdPlayerPairs.TryGetValue(connectionId, out partyMember);
+
+            return partyMember.partyName;
         }
     }
 }

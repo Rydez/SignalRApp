@@ -4,7 +4,8 @@ var VillageCreator = {
 
     initialize: function (gameCanvas, canvasDimensions, gameConstants) {
         this._gameCanvas = gameCanvas;
-        
+
+        this.structureIndices = [];
         this.structureObjects = [];
         this.villageBackground;
 
@@ -22,12 +23,15 @@ var VillageCreator = {
         this._xOrigin = -0.5 * this._tileWidth;
         this._yOrigin = -0.5 * this._tileHeight;
 
-        this.createMap();
+        this.createVillage();
     },
 
-    createMap: function () {
+    createVillage: function () {
+        var structures = Object.create(Structures);
+        var structureInfo = structures.structureInfo;
+
         this.createLand();
-        this.createStructures();
+        this.createStructures(structureInfo, this.structureIndices);
     },
 
     createLand: function () {
@@ -47,16 +51,13 @@ var VillageCreator = {
         }
     },
 
-    createStructures: function () {
-        this.structureIndices = [];
+    createStructures: function (structureObjects, structureIndices) {
+        
 
-        var structures = Object.create(Structures);
-        structureInfo = structures.structureInfo;
+        for (var i = 0; i < structureObjects.length; i++) {
 
-        for (var i = 0; i < structureInfo.length; i++) {
-
-            // 's' is shorthand for structureInfo[i]
-            var s = structureInfo[i];
+            // 's' is shorthand for structureObjects[i]
+            var s = structureObjects[i];
             this.structureTemplate(s.name, s.xIndex, s.yIndex,
                                     s.width, s.height, s.xOffSet,
                                     s.yOffSet);
@@ -80,7 +81,7 @@ var VillageCreator = {
                     coveredIndices.push(coveredIndex);
                 }
             }
-            this.structureIndices.push(coveredIndices);
+            structureIndices.push(coveredIndices);
         }
     },
 
