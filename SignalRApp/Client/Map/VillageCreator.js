@@ -20,18 +20,18 @@ var VillageCreator = {
         this._canvasPixelHeight = canvasDimensions.height;
         this._tileWidth = gameConstants.tileWidth;
         this._tileHeight = gameConstants.tileHeight;
-        this._xOrigin = -0.5 * this._tileWidth;
-        this._yOrigin = -0.5 * this._tileHeight;
+        this.xTileOrigin = gameConstants.xTileOrigin;
+        this.yTileOrigin = gameConstants.yTileOrigin;
 
         this.createVillage();
     },
 
     createVillage: function () {
-        var structures = Object.create(Structures);
-        var structureInfo = structures.structureInfo;
+        var villageStructures = Object.create(VillageStructures);
+        var villageStructureInfo = villageStructures.villageStructureInfo;
 
         this.createLand();
-        this.createStructures(structureInfo, this.structureIndices);
+        this.createStructures(villageStructureInfo, this.structureIndices);
     },
 
     createLand: function () {
@@ -42,8 +42,8 @@ var VillageCreator = {
                 var xOffSet = (i % 2 === 0) ? 0 : 0.5 * this._tileWidth;
 
                 // Calculate position in units of pixels
-                var leftPosition = this._xOrigin + xOffSet + j * this._tileWidth;
-                var topPosition = this._yOrigin + i * 0.5 * this._tileHeight;
+                var leftPosition = this.xTileOrigin + xOffSet + j * this._tileWidth;
+                var topPosition = this.yTileOrigin + i * 0.5 * this._tileHeight;
 
                 // Create the tile
                 this.addGrassTile(leftPosition, topPosition);
@@ -51,13 +51,13 @@ var VillageCreator = {
         }
     },
 
-    createStructures: function (structureInfo, structureIndices) {
+    createStructures: function (villageStructureInfo, structureIndices) {
         
 
-        for (var i = 0; i < structureInfo.length; i++) {
+        for (var i = 0; i < villageStructureInfo.length; i++) {
 
-            // 's' is shorthand for structureInfo[i]
-            var s = structureInfo[i];
+            // 's' is shorthand for villageStructureInfo[i]
+            var s = villageStructureInfo[i];
             this.structureTemplate(s.name, s.xIndex, s.yIndex,
                                     s.width, s.height, s.xOffSet,
                                     s.yOffSet);

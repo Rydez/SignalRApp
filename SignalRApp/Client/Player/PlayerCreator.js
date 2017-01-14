@@ -19,8 +19,6 @@ var PlayerCreator = {
         this.mapTopShift = 0;
 
         this.playerSprite;
-
-        this.allPlayersOnCanvas = [];
     },
 
     syncWithMap: function (shifts) {
@@ -52,8 +50,6 @@ var PlayerCreator = {
                 left: _this.mapLeftShift + xPos,
                 top: _this.mapTopShift + yPos
             });
-
-            _this.allPlayersOnCanvas.push(playerFabricGroup);
 
             _this._gameCanvas.add(playerFabricGroup);
             playerFabricGroup.selectable = false;

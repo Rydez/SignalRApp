@@ -22,14 +22,18 @@
 $(function () {
 
     // Declare a proxy to reference the hub.
-    var gameProxy = $.connection.gameHub;
+    var gameHubProxy = $.connection.gameHub;
     var playerHubProxy = $.connection.playerHub;
+    var accountHubProxy = $.connection.accountHub;
+    var wildernessHubProxy = $.connection.wildernessHub;
+    var chatHubProxy = $.connection.chatHub;
 
     var game = Object.create(Game);
-    game.initialize(gameProxy, playerHubProxy);
+    game.initialize(gameHubProxy, playerHubProxy, wildernessHubProxy,
+                    chatHubProxy);
 
     var account = Object.create(Account);
-    account.initialize(gameProxy);
+    account.initialize(gameHubProxy, accountHubProxy);
 
     // Start the connection
     $.connection.hub.start();

@@ -1,14 +1,14 @@
 ﻿
 
 var PlayerController = {
-    initialize: function (gameProxy, gameCanvas, structureObjects,
+    initialize: function (playerHubProxy, gameCanvas, structureObjects,
                           canvasDimensions, gameConstants) {
 
         this.fabricUtilities = Object.create(FabricUtilities);
         this.playerUtilities = Object.create(PlayerUtilities);
         this.playerUtilities.initialize(gameCanvas, structureObjects, gameConstants);
 
-        this._gameProxy = gameProxy;
+        this.playerHubProxy = playerHubProxy;
 
         this._gameCanvas = gameCanvas;
 
@@ -56,7 +56,7 @@ var PlayerController = {
                 var xStepIndex = currentStep.xStepIndex;
                 var yStepIndex = currentStep.yStepIndex;
 
-                _this._gameProxy.server.movePlayer(xStepIndex, yStepIndex);
+                _this.playerHubProxy.server.movePlayer(xStepIndex, yStepIndex);
 
                 _stepIncrement += 1;
 

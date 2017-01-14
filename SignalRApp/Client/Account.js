@@ -1,9 +1,11 @@
 ﻿
 var Account = {
 
-    initialize: function (gameProxy) {
+    initialize: function (gameHubProxy, accountHubProxy) {
 
-        this.gameProxy = gameProxy;
+        // Hub proxies for server-client connection
+        this.gameHubProxy = gameHubProxy;
+        this.accountHubProxy = accountHubProxy;
 
         var _this = this;
 
@@ -24,7 +26,7 @@ var Account = {
         });
 
         // Lone signal function
-        gameProxy.client.accountError = function (errorMessage) {
+        gameHubProxy.client.accountError = function (errorMessage) {
             var loginContainer = document.getElementById('login-container');
             var loginStyle = window.getComputedStyle(loginContainer);
             var loginDisplay = loginStyle.getPropertyValue('display');
@@ -38,7 +40,7 @@ var Account = {
     },
 
     submitLogin: function () {
-        this.gameProxy.server.loginPlayer(
+        this.accountHubProxy.server.loginPlayer(
             document.getElementById('login-username-input').value,
             document.getElementById('login-password-input').value);
     },
@@ -53,7 +55,7 @@ var Account = {
         var password = document.getElementById('registration-password-input').value;
         var repeatedPassword = document.getElementById('registration-repeat-password-input').value;
         if (password === repeatedPassword) {
-            this.gameProxy.server.registerPlayer(username, password);
+            this.accountHubProxy.server.registerPlayer(username, password);
         }
         else {
             document.getElementById('registration-error-message-span').innerHTML = 'Passwords do not match';

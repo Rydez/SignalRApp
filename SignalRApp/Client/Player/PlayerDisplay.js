@@ -4,9 +4,9 @@ var PlayerDisplay = {
 
     // TODO: Awful lot of magic numbers in here. Create a constants section
 
-    initialize: function (gameCanvas, gameProxy) {
+    initialize: function (gameCanvas, playerHubProxy) {
         this._gameCanvas = gameCanvas;
-        this._gameProxy = gameProxy;
+        this.playerHubProxy = playerHubProxy;
 
         this.leftLocalDisplayMargin = 10;
         this.topLocalDisplayMargin = 10;
@@ -40,7 +40,7 @@ var PlayerDisplay = {
     },
 
     addRemotePlayerDisplay: function (remotePlayerId) {
-        this._gameProxy.server.getRemotePlayerDisplayInfo(remotePlayerId);
+        this.playerHubProxy.server.getRemotePlayerDisplayInfo(remotePlayerId);
     },
 
     removeRemotePlayerDisplay: function () {

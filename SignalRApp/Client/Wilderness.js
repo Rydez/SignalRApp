@@ -2,100 +2,55 @@
 
 var Wilderness = {
 
-    initialize: function (gameProxy, gameCanvas, canvasDimensions, structureObjects,
-                        villageBackground, allPlayersOnCanvas, gameConstants, villageCursor) {
-        this.gameProxy = gameProxy;
+    initialize: function (wildernessHubProxy, gameCanvas, canvasDimensions, structureObjects,
+                            gameConstants, wildernessInfo) {
+
+        this.wildernessHubProxy = wildernessHubProxy;
         this.gameCanvas = gameCanvas;
         this.canvasDimensions = canvasDimensions;
         this.gameConstants = gameConstants;
 
         this.tileWidth = gameConstants.tileWidth;
         this.tileHeight = gameConstants.tileHeight;
-
         this.xTileOrigin = gameConstants.xTileOrigin;
         this.yTileOrigin = gameConstants.yTileOrigin;
 
         this.canvasPixelWidth = canvasDimensions.width;
         this.canvasPixelHeight = canvasDimensions.height;
 
-        this.structureObjects = structureObjects;
-        this.villageBackground = villageBackground;
-        this.villageCursor = villageCursor;
+        this.wildernessWidth = wildernessInfo.wildernessWidth;
+        this.wildernessHeight = wildernessInfo.wildernessHeight;
+        this.wildernessStructureInfo = wildernessInfo.wildernessStructureObjects;
 
-        this.allPlayersOnCanvas = allPlayersOnCanvas;
+        this.structureObjects = structureObjects;
 
         this.structureIndices = [];
 
         this.numberOfGrassTiles = 0;
 
-        //var _this = this;
-        //gameProxy.client.switchToWilderness = function (wildernessInfo) {
-        //    _this.wildernessWidth = wildernessInfo.wildernessWidth;
-        //    _this.wildernessHeight = wildernessInfo.wildernessHeight;
-
-        //    _this.structureObjects = wildernessInfo.wildernessStructureObjects;
-
-        //    _this.clearVillage();
-        //    _this.createWilderness();
-
-        //    _this.wildernessCursor = Object.create(CursorFabric);
-        //    _this.wildernessCursor.initialize(_this.gameCanvas, _this.gameConstants,
-        //            _this.structureIndices, _this.canvasDimensions);
-
-        //    // Add players in party
-        //    _this.gameProxy.server.addPartyMembers();
-
-        //    _this.gameCanvas.renderAll();
-        //};
+        this.startWilderness();
     },
 
-    clearVillageAndCreateWilderness: function (wildernessInfo) {
-        this.wildernessWidth = wildernessInfo.wildernessWidth;
-        this.wildernessHeight = wildernessInfo.wildernessHeight;
-
-        this.wildernessStructureInfo = wildernessInfo.wildernessStructureObjects;
-
+    startWilderness: function () {
         this.clearVillage();
-        this.createWilderness();
+        this.createLand();
+        this.createStructures(this.wildernessStructureInfo, this.structureIndices);
 
-        //this.wildernessCursor = Object.create(CursorFabric);
-        //this.wildernessCursor.initialize(this.gameCanvas, this.gameConstants,
-        //        this.structureIndices, this.canvasDimensions);
-        //this.wildernessCursor._cursor.moveTo(1);
-
-        // Add players in party
-        this.gameProxy.server.addPartyMembers();
-
+        // Add players in party or individual players.
+        // TODO: This is a lie. A single player without a party can
+        // enter the wilderness
+        this.wildernessHubProxy.server.addPartyMembers();
 
         this.gameCanvas.renderAll();
     },
 
-    // TODO: Consider moving this to the villageCreator
     clearVillage: function () {
         
+        // Clear village objects
         this.structureObjects.length = 0;
 
         // Clear everything so that background can be cached
         this.gameCanvas.clear();
-
-        //// Clear village and structures
-        //this.gameCanvas.remove(this.villageBackground);
-        //for (var i = 0; i < this.structureObjects.length; i++) {
-        //    this.gameCanvas.remove(this.structureObjects[i]);
-        //}
-
-        //// Clear all players
-        //for (var i = 0; i < this.allPlayersOnCanvas.length; i++) {
-        //    this.gameCanvas.remove(this.allPlayersOnCanvas[i]);
-        //}
-
-        //// Clear village cursor
-        //this.gameCanvas.remove(this.villageCursor);
-    },
-
-    createWilderness: function () {
-        this.createLand();
-        this.createStructures(this.wildernessStructureInfo, this.structureIndices);
     },
 
     createLand: function () {
@@ -110,39 +65,29 @@ var Wilderness = {
                 var topPosition = this.yTileOrigin + i * 0.5 * this.tileHeight;
 
                 // Create the tile
-                this.addGrassTile(leftPosition, topPosition);
-                //this.numberOfGrassTiles += 1;
-
-                //// Cache on last grass tile
-                //if (this.numberOfGrassTiles === this.wildernessWidth * this.wildernessHeight) {
-                //    this.cacheLand();
-                //}
+                this.addTileAndCacheOnLastTile(leftPosition, topPosition);
             }
         }
     },
 
-    addGrassTile: function (leftPosition, topPosition) {
+    addTileAndCacheOnLastTile: function (leftPosition, topPosition) {
         var _this = this;
         var grassTile = new fabric.Image.fromURL('Client/images/grass_tile.png', function (img) {
-            _this.setupGrassTile(img, leftPosition, topPosition);
+            var grassTileImage = img.set({
+                id: 'grassTile',
+                left: leftPosition,
+                top: topPosition
+            });
+            _this.gameCanvas.add(grassTileImage);
+            grassTileImage.selectable = false;
+
+            _this.numberOfGrassTiles += 1;
+
+            // Cache on last grass tile
+            if (_this.numberOfGrassTiles === _this.wildernessWidth * _this.wildernessHeight) {
+                _this.cacheLand();
+            }
         });
-    },
-
-    setupGrassTile: function (img, leftPosition, topPosition) {
-        var grassTileImage = img.set({
-            id: 'grassTile',
-            left: leftPosition,
-            top: topPosition
-        });
-        this.gameCanvas.add(grassTileImage);
-        grassTileImage.selectable = false;
-
-        this.numberOfGrassTiles += 1;
-
-        // Cache on last grass tile
-        if (this.numberOfGrassTiles === this.wildernessWidth * this.wildernessHeight) {
-            this.cacheLand();
-        }
     },
 
     cacheLand: function () {
@@ -169,8 +114,6 @@ var Wilderness = {
             });
             _this.wildernessBackground = landImg;
             _this.gameCanvas.add(_this.wildernessBackground);
-            //_this.gameCanvas.sendToBack(_this.wildernessBackground);
-
             _this.wildernessBackground.selectable = false;
 
             //TODO: Should probably move this out of here.

@@ -2,11 +2,12 @@
 
 var Chat = {
 
-    initialize: function (gameProxy) {
+    initialize: function (gameProxy, chatHubProxy) {
 
         this.isChatting = false;
 
-        this._gameProxy = gameProxy;
+        this.gameProxy = gameProxy;
+        this.chatHubProxy = chatHubProxy;
 
         // Leave this alone for resetting opacity
         const constMinOpacity = 0.1;
@@ -98,7 +99,7 @@ var Chat = {
         if (KeyCode === 13) {
             var message = $('#input-message').val();
             if (message) {
-                this._gameProxy.server.sendMessageToAll(message);
+                this.chatHubProxy.server.sendMessageToAll(message);
 
                 // Clear input box
                 $('#input-message').val('').focus();

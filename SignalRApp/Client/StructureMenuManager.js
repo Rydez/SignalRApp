@@ -2,8 +2,8 @@
 
 var StructureMenuManager = {
 
-    initialize: function (gameProxy, canvasManager, structureObjects) {
-        this._gameProxy = gameProxy;
+    initialize: function (gameProxy, playerHubProxy, canvasManager, structureObjects) {
+        this.playerHubProxy = playerHubProxy;
 
         this.canvasManager = canvasManager;
 
@@ -31,7 +31,7 @@ var StructureMenuManager = {
 
                         // Open appropriate menu
                         if (this.structureObjects[i].id === 'mountain1') {
-                            this._gameProxy.server.checkWildernessReadiness();
+                            this.playerHubProxy.server.checkWildernessReadiness();
                         }
                     }
                 }

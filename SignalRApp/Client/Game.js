@@ -1,12 +1,14 @@
 ﻿
 var Game = {
 
-    initialize: function (gameProxy, playerHubProxy) {
+    initialize: function (gameProxy, playerHubProxy, wildernessHubProxy,
+                          chatHubProxy) {
 
         this.isInWilderness = false;
 
         this.gameProxy = gameProxy;
         this.playerHubProxy = playerHubProxy;
+        this.wildernessHubProxy = wildernessHubProxy;
 
         this.gameConstants = Object.create(GameConstants);
         this.gameConstants.initialize();
@@ -19,12 +21,12 @@ var Game = {
                 this.gameConstants);
 
         this.player = Object.create(Player);
-        this.player.initialize(this.gameProxy, this.canvasManager.getCanvas(),
+        this.player.initialize(gameProxy, playerHubProxy, this.canvasManager.getCanvas(),
                 this.gameConstants, this.map.villageCreator.getStructureObjects(),
                 this.canvasManager.getDimensions());
 
         this.structureMenuManager = Object.create(StructureMenuManager);
-        this.structureMenuManager.initialize(gameProxy, this.canvasManager,
+        this.structureMenuManager.initialize(gameProxy, playerHubProxy, this.canvasManager,
                 this.map.villageCreator.getStructureObjects());
 
         this.cursorFabric = Object.create(CursorFabric);
@@ -33,19 +35,10 @@ var Game = {
                 this.canvasManager.getDimensions());
 
         this.chat = Object.create(Chat);
-        this.chat.initialize(this.gameProxy);
+        this.chat.initialize(gameProxy, chatHubProxy);
 
         this.party = Object.create(Party);
-        this.party.initialize(this.gameProxy, this.canvasManager, this.canvasManager.getCanvas());
-
-        //this.wilderness = Object.create(Wilderness);
-        //this.wilderness.initialize(this.gameProxy, this.canvasManager.getCanvas(),
-        //                           this.canvasManager.getDimensions(),
-        //                           this.map.villageCreator.structureObjects,
-        //                           this.map.villageCreator.villageBackground,
-        //                           this.player.playerCreator.allPlayersOnCanvas,
-        //                           this.gameConstants, this.cursorFabric._cursor);
-
+        this.party.initialize(gameProxy, this.canvasManager, this.canvasManager.getCanvas());
         
         var _this = this;
         gameProxy.client.startGame = function () {
@@ -55,14 +48,10 @@ var Game = {
         gameProxy.client.switchToWilderness = function (wildernessInfo) {
 
             _this.wilderness = Object.create(Wilderness);
-            _this.wilderness.initialize(_this.gameProxy, _this.canvasManager.getCanvas(),
+            _this.wilderness.initialize(_this.wildernessHubProxy, _this.canvasManager.getCanvas(),
                                        _this.canvasManager.getDimensions(),
                                        _this.map.villageCreator.structureObjects,
-                                       _this.map.villageCreator.villageBackground,
-                                       _this.player.playerCreator.allPlayersOnCanvas,
-                                       _this.gameConstants, _this.cursorFabric._cursor);
-
-            _this.wilderness.clearVillageAndCreateWilderness(wildernessInfo);
+                                       _this.gameConstants, wildernessInfo);
 
             _this.isInWilderness = true;
         };
@@ -101,37 +90,37 @@ var Game = {
 
         // Handle mouse clicks
         this.canvasManager.getCanvas().on('mouse:up', function (event) {
-            var objId = event.target.id;
+            var objId = event.target.id || false;
 
             if (objId) {
                 if (objId.indexOf('PlayerDisplay') !== -1) {
                     _this.player.playerDisplay.addPlayerDisplayOptions(objId, event);
                 }
                 else if (objId.indexOf('inviteOption') !== -1) {
-                    _this.gameProxy.server.invitePlayer(objId.split(':')[1]);
+                    _this.playerHubProxy.server.invitePlayer(objId.split(':')[1]);
                 }
                 else if (objId.indexOf('leaveOption') !== -1) {
-                    _this.gameProxy.server.leaveParty();
+                    _this.playerHubProxy.server.leaveParty();
                 }
                 else if (objId.indexOf('playerInPartyConfirmation') !== -1) {
                     _this.party.removePlayerInPartyResponse();
                 }
                 else if (objId.indexOf('acceptInvitation') !== -1) {
-                    _this.gameProxy.server.acceptInvitation();
+                    _this.playerHubProxy.server.acceptInvitation();
                     _this.party.removeInvitation();
                 }
                 else if (objId.indexOf('rejectInvitation') !== -1) {
-                    _this.gameProxy.server.rejectInvitation();
+                    _this.playerHubProxy.server.rejectInvitation();
                     _this.party.removeInvitation();
                 }
                 else if (objId.indexOf('readyCheck') !== -1) {
-                    _this.gameProxy.server.changeReadyStatus();
+                    _this.playerHubProxy.server.changeReadyStatus();
                 }
                 else if (objId.indexOf('notReadyConfirmation') !== -1) {
                     _this.structureMenuManager.wildernessMenu.removeNotReadyResponse();
                 }
                 else if (objId.indexOf('enterWilderness') !== -1) {
-                    _this.gameProxy.server.switchToWilderness();
+                    _this.wildernessHubProxy.server.switchToWilderness();
                 }
                 else if (objId.indexOf('cancelWilderness') !== -1) {
                     _this.structureMenuManager.wildernessMenu.removeEnterConfirmationResponse();
