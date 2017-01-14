@@ -20,11 +20,13 @@ namespace SignalRApp.Server
             wildernessWidth = rnd.Next(32, 50);
             wildernessHeight = rnd.Next(92, 150);
 
-            int randomNumberOfStructures = rnd.Next(20, 40);
+            int randomNumberOfStructures = rnd.Next(60, 180);
+
+            wildernessStructureObjects = new List<WildernessStructure>();
 
             for (int i = 0; i < randomNumberOfStructures; i++)
             {
-                WildernessStructure nextStruct = new WildernessStructure();
+                WildernessStructure nextStruct = new WildernessStructure(rnd);
                 wildernessStructureObjects.Add(nextStruct);
             }
         }

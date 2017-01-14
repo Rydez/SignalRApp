@@ -13,7 +13,7 @@ var PlayerCreator = {
 
         this._gameCanvas = gameCanvas;
 
-        this._structureObjects = structureObjects;
+        this.structureObjects = structureObjects;
 
         this.mapLeftShift = 0;
         this.mapTopShift = 0;
@@ -59,7 +59,7 @@ var PlayerCreator = {
             playerFabricGroup.selectable = false;
             playerFabricGroup.moveTo(2);
             _this.playerUtilities.handleStructureCollision(playerFabricGroup,
-                    _this._structureObjects);
+                    _this.structureObjects);
 
             if (isLocalPlayer) {
                 _this.playerSprite = playerFabricGroup;

@@ -63,8 +63,8 @@ var Structures = {
                 yOffSet: 8
             }, {
                 name: 'mountain1',
-                xIndex: 60,
-                yIndex: -15,
+                xIndex: 30,
+                yIndex: -10,
                 width: 240,
                 height: 200,
                 xOffSet: -8,

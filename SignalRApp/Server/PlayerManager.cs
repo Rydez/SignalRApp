@@ -104,9 +104,18 @@ namespace SignalRApp.Server
             bool isLocalPlayer = false;
 
             // Add new player to remotes clients
-            _context.Clients.Group(clientPlayer.partyName, connectionId).addPlayerToRoom(isLocalPlayer,
+            string partyName = GetPartyName(connectionId);
+            if (string.IsNullOrEmpty(partyName))
+            {
+                _context.Clients.Client(connectionId).addPlayerToRoom(isLocalPlayer,
                 connectionId, clientPlayer.name, clientPlayer.xPos, clientPlayer.yPos,
                 clientPlayer.level, clientPlayer.gold, clientPlayer.health, clientPlayer.mana);
+                return;
+            }
+
+            _context.Clients.Group(clientPlayer.partyName, connectionId).addPlayerToRoom(isLocalPlayer,
+            connectionId, clientPlayer.name, clientPlayer.xPos, clientPlayer.yPos,
+            clientPlayer.level, clientPlayer.gold, clientPlayer.health, clientPlayer.mana);
         }
 
         public void AddPlayersToClient(string connectionId)

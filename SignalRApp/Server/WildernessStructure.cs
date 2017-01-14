@@ -15,15 +15,14 @@ namespace SignalRApp.Server
         public int xOffSet { get; set; }
         public int yOffSet { get; set; }
 
-        public WildernessStructure()
+        public WildernessStructure(Random rnd)
         {
             // NOTE: rnd.Next() * Math.Abs(max - min) + min
 
-            Random rnd = new Random();
 
             name = "tree1";
             xIndex = rnd.Next(0, 60);
-            yIndex = rnd.Next() * Math.Abs(20 - (-20)) + (-20);
+            yIndex = Convert.ToInt32(rnd.NextDouble() * Math.Abs(20 - (-20)) + (-20));
             width = 80;
             height = 71;
             xOffSet = 0;

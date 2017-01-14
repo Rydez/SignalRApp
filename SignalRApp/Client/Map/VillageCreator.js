@@ -51,13 +51,13 @@ var VillageCreator = {
         }
     },
 
-    createStructures: function (structureObjects, structureIndices) {
+    createStructures: function (structureInfo, structureIndices) {
         
 
-        for (var i = 0; i < structureObjects.length; i++) {
+        for (var i = 0; i < structureInfo.length; i++) {
 
-            // 's' is shorthand for structureObjects[i]
-            var s = structureObjects[i];
+            // 's' is shorthand for structureInfo[i]
+            var s = structureInfo[i];
             this.structureTemplate(s.name, s.xIndex, s.yIndex,
                                     s.width, s.height, s.xOffSet,
                                     s.yOffSet);

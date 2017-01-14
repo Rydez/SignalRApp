@@ -4,32 +4,35 @@
 // numbers to this object
 var GameConstants = {
 
-    // Z index constants
-    zBackground: 0,
-    zCursor: 1,
-    
-    // Player can be above cursor or below playerDisplay
-    zPlayer: 2,
+    initialize: function () {
 
-    // Structures can be above cursor or below playerDisplay
-    zStructure: 3,
+        // Z index constants
+        this.zBackground = 0;
+        this.zCursor = 1;
 
-    // At the top
-    zPlayerDisplay: 5,
+        // Player can be above cursor or below playerDisplay
+        this.zPlayer = 2;
 
-    // In units of tiles
-    mapWidth: 32,
-    mapHeight: 92,
+        // Structures can be above cursor or below playerDisplay
+        this.zStructure = 3;
 
-    // In units of pixels
-    tileWidth: 80,
-    tileHeight: 40,
+        // At the top
+        this.zPlayerDisplay = 5;
 
-    // Upper left corner (or origin) of the tile from the center
-    xTileOrigin: -0.5 * this.tileWidth,
-    yTileOrigin: -0.5 * this.tileHeight,
+        // In units of tiles
+        this.mapWidth = 32;
+        this.mapHeight = 92;
 
-    // Indices to determine starting pos
-    xStartIndex: 9,
-    yStartIndex: 0
+        // In units of pixels
+        this.tileWidth = 80;
+        this.tileHeight = 40;
+
+        // Upper left corner (or origin) of the tile from the center
+        this.xTileOrigin = -0.5 * this.tileWidth;
+        this.yTileOrigin = -0.5 * this.tileHeight;
+
+        // Indices to determine starting pos
+        this.xStartIndex = 9;
+        this.yStartIndex = 0;
+    }
 };

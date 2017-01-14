@@ -49,16 +49,25 @@ namespace SignalRApp.Hubs
             }
         }
 
-        public void AddAllPlayers()
-        {
-            PlayerManager.AddClientToRemotePlayers(Context.ConnectionId);
-            PlayerManager.AddPlayersToClient(Context.ConnectionId);
-        }
+        //public void AddAllPlayers()
+        //{
+        //    PlayerManager.AddClientToRemotePlayers(Context.ConnectionId);
+        //    PlayerManager.AddPlayersToClient(Context.ConnectionId);
+        //}
 
         public void AddPartyMembers()
         {
-            PlayerManager.AddClientToPartyMembers(Context.ConnectionId);
-            PlayerManager.AddPartyMembersToClient(Context.ConnectionId);
+            string partyName = PlayerManager.GetPartyName(Context.ConnectionId);
+            if (string.IsNullOrEmpty(partyName))
+            {
+                PlayerManager.AddClientToPartyMembers(Context.ConnectionId);
+                PlayerManager.AddPartyMembersToClient(Context.ConnectionId);
+                return;
+            }
+
+            //TODO: fix this lie. Here the client's player is being added. But there
+            // are no remote players
+            PlayerManager.AddClientToRemotePlayers(Context.ConnectionId);
         }
 
         // Function executed when on keydown
@@ -108,12 +117,18 @@ namespace SignalRApp.Hubs
             PlayerManager.ChangeReadyStatus(Context.ConnectionId);
         }
 
-        public void CreateRandomWildernessItems()
+        public void SwitchToWilderness()
         {
             Wilderness wilderness = new Wilderness();
-            string partyName = PlayerManager.GetPartyName(Context.ConnectionId);
 
-            Clients.Group(partyName).createWilderness(wilderness);
+            string partyName = PlayerManager.GetPartyName(Context.ConnectionId);
+            if (string.IsNullOrEmpty(partyName))
+            {
+                Clients.Client(Context.ConnectionId).switchToWilderness(wilderness);
+                return;
+            }
+
+            Clients.Group(partyName).switchToWilderness(wilderness);
         }
     }
 }

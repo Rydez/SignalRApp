@@ -1,11 +1,15 @@
 ﻿
 var Game = {
 
-    initialize: function (gameProxy) {
+    initialize: function (gameProxy, playerHubProxy) {
+
+        this.isInWilderness = false;
 
         this.gameProxy = gameProxy;
+        this.playerHubProxy = playerHubProxy;
 
         this.gameConstants = Object.create(GameConstants);
+        this.gameConstants.initialize();
 
         this.canvasManager = Object.create(CanvasManager);
         this.canvasManager.initialize();
@@ -34,18 +38,33 @@ var Game = {
         this.party = Object.create(Party);
         this.party.initialize(this.gameProxy, this.canvasManager, this.canvasManager.getCanvas());
 
-        this.wilderness = Object.create(Wilderness);
-        this.wilderness.initialize(this.gameProxy, this.canvasManager.getCanvas(),
-                                   this.canvasManager.getDimensions(),
-                                   this.map.villageCreator.structureObjects,
-                                   this.map.villageCreator.villageBackground,
-                                   this.player.playerCreator.allPlayersOnCanvas,
-                                   this.gameConstants, this.cursorFabric._cursor);
+        //this.wilderness = Object.create(Wilderness);
+        //this.wilderness.initialize(this.gameProxy, this.canvasManager.getCanvas(),
+        //                           this.canvasManager.getDimensions(),
+        //                           this.map.villageCreator.structureObjects,
+        //                           this.map.villageCreator.villageBackground,
+        //                           this.player.playerCreator.allPlayersOnCanvas,
+        //                           this.gameConstants, this.cursorFabric._cursor);
 
-        // Lone signal function
+        
         var _this = this;
         gameProxy.client.startGame = function () {
             _this.startGame();
+        };
+
+        gameProxy.client.switchToWilderness = function (wildernessInfo) {
+
+            _this.wilderness = Object.create(Wilderness);
+            _this.wilderness.initialize(_this.gameProxy, _this.canvasManager.getCanvas(),
+                                       _this.canvasManager.getDimensions(),
+                                       _this.map.villageCreator.structureObjects,
+                                       _this.map.villageCreator.villageBackground,
+                                       _this.player.playerCreator.allPlayersOnCanvas,
+                                       _this.gameConstants, _this.cursorFabric._cursor);
+
+            _this.wilderness.clearVillageAndCreateWilderness(wildernessInfo);
+
+            _this.isInWilderness = true;
         };
     },
 
@@ -53,10 +72,10 @@ var Game = {
 
         // Sync The new client with other clients 
         // (Really starts creation of all players)
-        this.gameProxy.server.addAllPlayers();
+        this.playerHubProxy.server.addAllPlayers();
 
         this.mouseBindings();
-        this.keyboardBindings();
+        this.setKeyboardBindings();
         this.windowBindings();
         this.showGame();
     },
@@ -112,8 +131,7 @@ var Game = {
                     _this.structureMenuManager.wildernessMenu.removeNotReadyResponse();
                 }
                 else if (objId.indexOf('enterWilderness') !== -1) {
-                    _this.wilderness.clearVillage();
-                    _this.gameProxy.server.createRandomWildernessItems();
+                    _this.gameProxy.server.switchToWilderness();
                 }
                 else if (objId.indexOf('cancelWilderness') !== -1) {
                     _this.structureMenuManager.wildernessMenu.removeEnterConfirmationResponse();
@@ -139,36 +157,47 @@ var Game = {
         });
     },
 
-    keyboardBindings: function () {
+    setKeyboardBindings: function () {
         var _this = this;
 
         // Handle key downs
         $(document).keydown(function (event) {
-
-            // check if player is chatting
-            var isChatting = _this.chat.checkPlayerChatting();
-            if (isChatting) {
-                _this.chat.sendMessageToAll(event.which);
-                _this.chat.unfocusChat(event.which);
+            if (_this.isInWilderness) {
+                _this.keyboardBindings(event, _this.wilderness.wildernessCursor);
             }
             else {
-                _this.map.mapController.controlMap(event.which);
-                _this.cursorFabric.uncreatePath(event.which);
-                _this.cursorFabric.moveCursor(event.which);
-                _this.player.playerController.controlPlayer(event.which, _this.cursorFabric);
-                _this.structureMenuManager.promptMenu(event.which, _this.player.playerCreator.playerSprite);
+                _this.keyboardBindings(event, _this.cursorFabric);
             }
 
-            var mapShifts = _this.map.mapController.getMapShifts();
-            _this.cursorFabric.syncWithMap(mapShifts);
-            _this.player.playerController.syncWithMap(mapShifts);
-            _this.player.playerCreator.syncWithMap(mapShifts);
-            _this.player.playerDisplay.syncWithMap(mapShifts);
-            _this.party.syncWithMap(mapShifts);
-
-            var pathSteps = _this.cursorFabric.getPathSteps();
-            _this.player.playerController.syncWithCursor(pathSteps);
         });
+    },
+
+    keyboardBindings: function (event, cursor) {
+        var _this = this;
+
+        // check if player is chatting
+        var isChatting = _this.chat.checkPlayerChatting();
+        if (isChatting) {
+            _this.chat.sendMessageToAll(event.which);
+            _this.chat.unfocusChat(event.which);
+        }
+        else {
+            _this.map.mapController.controlMap(event.which);
+            cursor.uncreatePath(event.which);
+            cursor.moveCursor(event.which);
+            _this.player.playerController.controlPlayer(event.which, cursor);
+            _this.structureMenuManager.promptMenu(event.which, _this.player.playerCreator.playerSprite);
+        }
+
+        var mapShifts = _this.map.mapController.getMapShifts();
+        cursor.syncWithMap(mapShifts);
+        _this.player.playerController.syncWithMap(mapShifts);
+        _this.player.playerCreator.syncWithMap(mapShifts);
+        _this.player.playerDisplay.syncWithMap(mapShifts);
+        _this.party.syncWithMap(mapShifts);
+
+        var pathSteps = cursor.getPathSteps();
+        _this.player.playerController.syncWithCursor(pathSteps);
     },
 
     windowBindings: function () {
