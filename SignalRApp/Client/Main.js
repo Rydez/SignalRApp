@@ -6,8 +6,6 @@
 
 //TODO: Handle disconnecting while in group
 
-//BUG: Don't open multiple prompts when clicked multiple times
-
 //BUG: Scroll to the right side of the land and then stretch the right side
 // of the browser outward
 

@@ -169,6 +169,11 @@ namespace SignalRApp.Server
             }
         }
 
+        public void ReAddGroupSprites(string connectionId)
+        {
+            _context.Clients.Client(connectionId).reAddGroupSprites();
+        }
+
         // Remove a player
         public void TerminatePlayer(string connectionId)
         {

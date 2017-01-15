@@ -7,6 +7,9 @@ var PlayerSignal = {
         // Create player
         gameProxy.client.addPlayerToRoom = function (isLocalPlayer, id, name, xPos, yPos, level,
                                                      gold, health, mana) {
+            if (playerCreator.playerSprite && isLocalPlayer) {
+                playerCreator.reAddPlayer();
+            }
             playerCreator.createPlayer(isLocalPlayer, id, name, xPos, yPos, level, gold,
                                       health, mana);
         };

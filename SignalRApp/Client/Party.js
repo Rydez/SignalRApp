@@ -8,6 +8,9 @@ var Party = {
 
         this._gameCanvas = canvasManager.getCanvas();
 
+        this.localPartyMenuOpen;
+        this.remotePartyMenuOpen;
+
         this.invitationRect;
         this.invitationText;
         this.acceptButton;
@@ -28,11 +31,45 @@ var Party = {
 
         // TODO: put these in a PartySignal file
         gameProxy.client.invitePlayerToParty = function (nameOfInviter) {
-            _this.createInvitation(nameOfInviter);
+            if (!_this.invitationRect) {
+                _this.createInvitation(nameOfInviter);
+                _this.remotePartyMenuOpen = true;
+            }
+            else if (!_this.remotePartyMenuOpen) {
+                _this._gameCanvas.add(_this.invitationRect);
+                _this._gameCanvas.add(_this.invitationText);
+                _this._gameCanvas.add(_this.acceptButton);
+                _this._gameCanvas.add(_this.acceptButtonText);
+                _this._gameCanvas.add(_this.rejectButton);
+                _this._gameCanvas.add(_this.rejectButtonText);
+
+                _this.invitationRect.bringToFront();
+                _this.invitationText.bringToFront();
+                _this.acceptButton.bringToFront();
+                _this.acceptButtonText.bringToFront();
+                _this.rejectButton.bringToFront();
+                _this.rejectButtonText.bringToFront();
+                _this.remotePartyMenuOpen = true;
+            }
         };
         
         gameProxy.client.playerIsAlreadyInAParty = function () {
-            _this.createPlayerInPartyResponse();
+            if (!_this.playerInPartyRect) {
+                _this.createPlayerInPartyResponse();
+                _this.localPartyMenuOpen = true;
+            }
+            else if (!_this.localPartyMenuOpen) {
+                _this._gameCanvas.add(_this.playerInPartyRect);
+                _this._gameCanvas.add(_this.playerInPartyText);
+                _this._gameCanvas.add(_this.playerInPartyConfirmationButton);
+                _this._gameCanvas.add(_this.playerInPartyButtonText);
+
+                _this.playerInPartyRect.bringToFront();
+                _this.playerInPartyText.bringToFront();
+                _this.playerInPartyConfirmationButton.bringToFront();
+                _this.playerInPartyButtonText.bringToFront();
+                _this.localPartyMenuOpen = true;
+            }
         };
 
         gameProxy.client.addPartyMembersToNewMember = function (partyMembers) {
@@ -96,6 +133,14 @@ var Party = {
                     _this._gameCanvas.renderAll();
                 }
             }
+        };
+
+        gameProxy.client.reAddGroupSprites = function () {
+            for (var i = 0; i < _this.memberDisplayGroups.length; i++) {
+                _this._gameCanvas.add(_this.memberDisplayGroups[i].memberDisplayGroup);
+            }
+
+            _this._gameCanvas.renderAll();
         };
     },
 
@@ -424,6 +469,7 @@ var Party = {
         this._gameCanvas.remove(this.rejectButton);
         this._gameCanvas.remove(this.rejectButtonText);
         this._gameCanvas.renderAll();
+        this.remotePartyMenuOpen = false;
     },
 
     removePlayerInPartyResponse: function () {
@@ -432,5 +478,6 @@ var Party = {
         this._gameCanvas.remove(this.playerInPartyConfirmationButton);
         this._gameCanvas.remove(this.playerInPartyButtonText);
         this._gameCanvas.renderAll();
+        this.localPartyMenuOpen = false;
     }
 }

@@ -8,10 +8,9 @@ var WildernessMenu = {
 
         this._gameCanvas = this.canvasManager.getCanvas();
 
-        this.notReadyRect;
-        this.notReadyText;
-        this.notReadyConfirmationButton;
-        this.notReadyButtonText;
+        this.wildernessMenuOpen = false;
+
+        this.notReadyGroup;
 
         this.confirmationRect;
         this.confirmationText;
@@ -21,11 +20,38 @@ var WildernessMenu = {
         this.cancelButtonText;
 
         gameProxy.client.notReadyForWilderness = function (notReadyStatus) {
-            _this.createNotReadyResponse(notReadyStatus);
+            if (!_this.notReadyGroup) {
+                _this.createNotReadyResponse(notReadyStatus);
+                _this.wildernessMenuOpen = true;
+            }
+            else if (!_this.wildernessMenuOpen) {
+                _this._gameCanvas.add(_this.notReadyGroup);
+                _this.notReadyGroup.bringToFront();
+                _this.wildernessMenuOpen = true;
+            }
         };
 
         gameProxy.client.enterWildernessConfirmation = function () {
-            _this.createEnterConfirmationResponse();
+            if (!_this.confirmationRect) {
+                _this.createEnterConfirmationResponse();
+                _this.wildernessMenuOpen = true;
+            }
+            else if (!_this.wildernessMenuOpen) {
+                _this._gameCanvas.add(_this.confirmationRect);
+                _this._gameCanvas.add(_this.confirmationText);
+                _this._gameCanvas.add(_this.enterButton);
+                _this._gameCanvas.add(_this.enterButtonText);
+                _this._gameCanvas.add(_this.cancelButton);
+                _this._gameCanvas.add(_this.cancelButtonText);
+
+                _this.confirmationRect.bringToFront();
+                _this.confirmationText.bringToFront();
+                _this.enterButton.bringToFront();
+                _this.enterButtonText.bringToFront();
+                _this.cancelButton.bringToFront();
+                _this.cancelButtonText.bringToFront();
+                _this.wildernessMenuOpen = true;
+            }
         };
     },
 
@@ -34,7 +60,7 @@ var WildernessMenu = {
         var canvasWidth = canvasDimensions.width;
         var canvasHeight = canvasDimensions.height;
 
-        var responseRectWidth = 400;
+        var responseRectWidth = 450;
         var responseRectHeight = 150;
 
         var responseButtonWidth = 80;
@@ -48,8 +74,9 @@ var WildernessMenu = {
         }
 
         var notReadyRect = new fabric.Rect({
-            left: canvasWidth / 2 - responseRectWidth / 2,
-            top: canvasHeight / 2 - responseRectHeight / 2,
+            id: 'notReadyRect',
+            left: 0,
+            top: 0,
             width: responseRectWidth,
             height: responseRectHeight,
             fill: 'rgba(10, 10, 10, 0.8)'
@@ -58,14 +85,18 @@ var WildernessMenu = {
         var notReadyText = new fabric.Text(responseMessage, {
             fontSize: 20,
             fill: 'rgba(255, 255, 255, 0.5)',
-            left: canvasWidth / 2 - responseRectWidth / 2 + 40,
-            top: canvasHeight / 2 - responseRectHeight / 2 + 40
+            originX: 'center',
+            originY: 'center',
+            left: notReadyRect.width / 2,
+            top: notReadyRect.height / 2 - 25
         });
 
         var notReadyConfirmationButton = new fabric.Rect({
             id: 'notReadyConfirmationButton',
-            left: canvasWidth / 2 - responseButtonWidth / 2,
-            top: canvasHeight / 2 - responseButtonHeight / 2 + 10,
+            left: notReadyRect.width / 2,
+            top: notReadyRect.height / 2 + 25,
+            originX: 'center',
+            originY: 'center',
             width: responseButtonWidth,
             height: responseButtonHeight,
             fill: 'rgba(0, 0, 0, 1)'
@@ -75,29 +106,24 @@ var WildernessMenu = {
             id: 'notReadyConfirmationText',
             fontSize: 15,
             fill: 'rgba(255, 255, 255, 0.5)',
-            left: canvasWidth / 2 - responseButtonWidth / 2 + 10,
-            top: canvasHeight / 2 - responseButtonHeight / 2 + 20
+            originX: 'center',
+            originY: 'center',
+            left: notReadyConfirmationButton.left,
+            top: notReadyConfirmationButton.top
         });
 
-        this.notReadyRect = notReadyRect;
-        this.notReadyText = notReadyText;
-        this.notReadyConfirmationButton = notReadyConfirmationButton;
-        this.notReadyButtonText = notReadyButtonText;
 
-        this._gameCanvas.add(this.notReadyRect);
-        this._gameCanvas.add(this.notReadyText);
-        this._gameCanvas.add(this.notReadyConfirmationButton);
-        this._gameCanvas.add(this.notReadyButtonText);
+        var notReadyGroup = new fabric.Group([notReadyRect, notReadyText,
+                            notReadyConfirmationButton, notReadyButtonText], {
+            id: 'notReadyConfirmation',
+            left: canvasWidth / 2 - responseRectWidth / 2,
+            top: canvasHeight / 2 - responseRectHeight / 2
+        });
 
-        this.notReadyRect.selectable = false;
-        this.notReadyText.selectable = false;
-        this.notReadyConfirmationButton.selectable = false;
-        this.notReadyButtonText.selectable = false;
-
-        this.notReadyRect.bringToFront();
-        this.notReadyText.bringToFront();
-        this.notReadyConfirmationButton.bringToFront();
-        this.notReadyButtonText.bringToFront();
+        this.notReadyGroup = notReadyGroup;
+        this._gameCanvas.add(this.notReadyGroup);
+        this.notReadyGroup.selectable = false;
+        this.notReadyGroup.bringToFront();
     },
 
     createEnterConfirmationResponse: function () {
@@ -124,14 +150,18 @@ var WildernessMenu = {
         var confirmationText = new fabric.Text(confirmationMessage, {
             fontSize: 20,
             fill: 'rgba(255, 255, 255, 0.5)',
-            left: canvasWidth / 2 - confirmationRectWidth / 2 + 40,
-            top: canvasHeight / 2 - confirmationRectHeight / 2 + 40
+            originX: 'center',
+            originY: 'center',
+            left: confirmationRect.left + (confirmationRectWidth/2),
+            top: confirmationRect.top + (confirmationRectHeight/2) - 25
         });
 
         var enterButton = new fabric.Rect({
             id: 'enterWildernessButton',
-            left: canvasWidth / 2 - buttonWidth / 2 - 90,
-            top: canvasHeight / 2 - buttonHeight / 2 + 10,
+            originX: 'center',
+            originY: 'center',
+            left: confirmationRect.left + (confirmationRectWidth/2) - (buttonWidth/2) - 10,
+            top: confirmationRect.top + (confirmationRectHeight/2) + 25,
             width: buttonWidth,
             height: buttonHeight,
             fill: 'rgba(0, 0, 0, 1)'
@@ -141,14 +171,18 @@ var WildernessMenu = {
             id: 'enterWildernessText',
             fontSize: 15,
             fill: 'rgba(255, 255, 255, 0.5)',
-            left: canvasWidth / 2 - buttonWidth / 2 - 80,
-            top: canvasHeight / 2 - buttonHeight / 2 + 20
+            originX: 'center',
+            originY: 'center',
+            left: enterButton.left,
+            top: enterButton.top
         });
 
         var cancelButton = new fabric.Rect({
             id: 'cancelWildernessButton',
-            left: canvasWidth / 2 - buttonWidth / 2 + 10,
-            top: canvasHeight / 2 - buttonHeight / 2 + 10,
+            originX: 'center',
+            originY: 'center',
+            left: confirmationRect.left + (confirmationRectWidth / 2) + (buttonWidth / 2) + 10,
+            top: confirmationRect.top + (confirmationRectHeight / 2) + 25,
             width: buttonWidth,
             height: buttonHeight,
             fill: 'rgba(0, 0, 0, 1)'
@@ -158,9 +192,12 @@ var WildernessMenu = {
             id: 'cancelWildernessText',
             fontSize: 15,
             fill: 'rgba(255, 255, 255, 0.5)',
-            left: canvasWidth / 2 - buttonWidth / 2 + 20,
-            top: canvasHeight / 2 - buttonHeight / 2 + 20
+            originX: 'center',
+            originY: 'center',
+            left: cancelButton.left,
+            top: cancelButton.top
         });
+
 
         this.confirmationRect = confirmationRect;
         this.confirmationText = confirmationText;
@@ -192,11 +229,9 @@ var WildernessMenu = {
     },
 
     removeNotReadyResponse: function () {
-        this._gameCanvas.remove(this.notReadyRect);
-        this._gameCanvas.remove(this.notReadyText);
-        this._gameCanvas.remove(this.notReadyConfirmationButton);
-        this._gameCanvas.remove(this.notReadyButtonText);
+        this._gameCanvas.remove(this.notReadyGroup);
         this._gameCanvas.renderAll();
+        this.wildernessMenuOpen = false;
     },
 
     removeEnterConfirmationResponse: function () {
@@ -207,6 +242,7 @@ var WildernessMenu = {
         this._gameCanvas.remove(this.cancelButton);
         this._gameCanvas.remove(this.cancelButtonText);
         this._gameCanvas.renderAll();
+        this.wildernessMenuOpen = false;
     }
 
 };

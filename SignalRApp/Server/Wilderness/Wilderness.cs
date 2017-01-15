@@ -37,13 +37,14 @@ namespace SignalRApp.Server
 
         public void EnterWilderness(string connectionId, string partyName, Wilderness wilderness)
         {
-            
+            // Remove wilderness entering players from the village
+            _context.Clients.All.removePlayerFromRoom(connectionId);
+
             if (string.IsNullOrEmpty(partyName))
             {
                 _context.Clients.Client(connectionId).createAndEnterWilderness(wilderness);
                 return;
             }
-
             _context.Clients.Group(partyName).createAndEnterWilderness(wilderness);
         }
     }

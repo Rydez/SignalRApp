@@ -24,6 +24,7 @@ namespace SignalRApp.Hubs
 
             PlayerManager.AddClientToPartyMembers(Context.ConnectionId);
             PlayerManager.AddPartyMembersToClient(Context.ConnectionId);
+            PlayerManager.ReAddGroupSprites(Context.ConnectionId);
         }
 
         public void SwitchToWilderness()

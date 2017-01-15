@@ -7,8 +7,6 @@ var PlayerCreator = {
         this.playerUtilities = Object.create(PlayerUtilities);
         this.playerUtilities.initialize(gameCanvas, structureObjects, gameConstants);
 
-        this.playerDisplay = playerDisplay;
-
         this.localDisplayCreated = false;
 
         this._gameCanvas = gameCanvas;
@@ -18,12 +16,19 @@ var PlayerCreator = {
         this.mapLeftShift = 0;
         this.mapTopShift = 0;
 
+        this.playerDisplay = playerDisplay;
         this.playerSprite;
     },
 
     syncWithMap: function (shifts) {
         this.mapLeftShift = shifts.left;
         this.mapTopShift = shifts.top;
+    },
+
+    reAddPlayer: function () {
+        this._gameCanvas.add(this.playerDisplay.localPlayerDisplay);
+        this._gameCanvas.add(this.playerSprite);
+        this._gameCanvas.renderAll();
     },
 
     createPlayer: function (isLocalPlayer, id, name, xPos, yPos, level, gold, health, mana) {
