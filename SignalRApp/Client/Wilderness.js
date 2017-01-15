@@ -36,10 +36,10 @@ var Wilderness = {
         this.createLand();
         this.createStructures(this.wildernessStructureInfo, this.structureIndices);
 
-        // Add players in party or individual players.
-        // TODO: This is a lie. A single player without a party can
-        // enter the wilderness
-        this.wildernessHubProxy.server.addPartyMembers();
+        //// Add players in party or individual players.
+        //// TODO: This is a lie. A single player without a party can
+        //// enter the wilderness
+        //this.wildernessHubProxy.server.addPartyMembers();
 
         this.gameCanvas.renderAll();
     },
@@ -116,15 +116,22 @@ var Wilderness = {
             _this.gameCanvas.add(_this.wildernessBackground);
             _this.wildernessBackground.selectable = false;
 
-            //TODO: Should probably move this out of here.
-            // consider making a next layer function
-            _this.wildernessCursor = Object.create(CursorFabric);
-            _this.wildernessCursor.initialize(_this.gameCanvas, _this.gameConstants,
-                    _this.structureIndices, _this.canvasDimensions);
-
-            _this.wildernessBackground.moveTo(0);
-            _this.wildernessCursor._cursor.moveTo(1);
+            _this.createRemainingWilderness();
         });
+    },
+
+    createRemainingWilderness: function () {
+        this.wildernessCursor = Object.create(CursorFabric);
+        this.wildernessCursor.initialize(this.gameCanvas, this.gameConstants,
+                this.structureIndices, this.canvasDimensions);
+
+        this.wildernessBackground.moveTo(0);
+        this.wildernessCursor._cursor.moveTo(1);
+
+        // Add players in party or individual players.
+        // TODO: This is a lie. A single player without a party can
+        // enter the wilderness
+        this.wildernessHubProxy.server.addPartyMembers();
     },
 
     createStructures: function (structureInfo, structureIndices) {

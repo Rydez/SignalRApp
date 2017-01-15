@@ -11,7 +11,7 @@ namespace SignalRApp.Hubs
 {
     // NOTE: Hub methods should be sorted based on 
     // where they are called on the client side.
-   
+
 
     // TODO: Add authorization attributes to the hub methods.
     // Google SignalR security to figure it out.

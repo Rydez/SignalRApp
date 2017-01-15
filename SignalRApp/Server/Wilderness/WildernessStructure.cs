@@ -26,7 +26,7 @@ namespace SignalRApp.Server
             width = 80;
             height = 71;
             xOffSet = 0;
-            yOffSet = 0;
+            yOffSet = 40;
         }
     }
 

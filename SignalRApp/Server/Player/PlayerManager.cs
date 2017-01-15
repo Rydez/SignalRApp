@@ -172,12 +172,21 @@ namespace SignalRApp.Server
         // Remove a player
         public void TerminatePlayer(string connectionId)
         {
+
+            Player disconnectingPlayer;
+            IdPlayerPairs.TryGetValue(connectionId, out disconnectingPlayer);
+
+            if (!string.IsNullOrEmpty(disconnectingPlayer.partyName))
+            {
+                LeaveParty(connectionId);
+            }
+
+            // Remove disconnected player
+            _context.Clients.All.removePlayerFromRoom(disconnectingPlayer.ConnectionId);
+
             // Get disconnected player
             Player disconnectedPlayer;
             IdPlayerPairs.TryRemove(connectionId, out disconnectedPlayer);
-
-            // Remove disconnected player
-            _context.Clients.All.removePlayerFromRoom(disconnectedPlayer.ConnectionId);
         }
 
         public string GetName(string connectionId)
@@ -356,6 +365,7 @@ namespace SignalRApp.Server
             _context.Clients.Group(leavingPlayer.partyName, connectionId).removeLeavingMemberFromPartyMembers(connectionId);
 
             PartyNameAndListOfPlayerIds[leavingPlayer.partyName].Remove(connectionId);
+            _context.Groups.Remove(connectionId, leavingPlayer.partyName);
 
             // If after leaving there is only one player left, then disband the party
             if (PartyNameAndListOfPlayerIds[leavingPlayer.partyName].Count == 1)
@@ -365,6 +375,10 @@ namespace SignalRApp.Server
 
                 lastPlayerInParty.partyName = "";
                 PartyNameAndListOfPlayerIds.Remove(leavingPlayer.partyName);
+                _context.Groups.Remove(lastPlayerInParty.ConnectionId, leavingPlayer.partyName);
+
+
+                _context.Clients.Client(lastPlayerInParty.ConnectionId).removeLeavingMemberReadyCheck();
             }
 
             leavingPlayer.partyName = "";
@@ -425,8 +439,7 @@ namespace SignalRApp.Server
 
             _context.Clients.Client(connectionId).changeLocalPlayerReadiness(statusChanger.isReadyForWilderness);
             _context.Clients.Group(statusChanger.partyName, connectionId).changeRemotePlayerReadiness(connectionId, 
-                                                                                                      statusChanger.isReadyForWilderness);
-
+                                                statusChanger.isReadyForWilderness);
         }
 
         public string GetPartyName(string connectionId)

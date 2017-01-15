@@ -45,7 +45,7 @@ var Game = {
             _this.startGame();
         };
 
-        gameProxy.client.switchToWilderness = function (wildernessInfo) {
+        gameProxy.client.createAndEnterWilderness = function (wildernessInfo) {
 
             _this.wilderness = Object.create(Wilderness);
             _this.wilderness.initialize(_this.wildernessHubProxy, _this.canvasManager.getCanvas(),
@@ -54,6 +54,11 @@ var Game = {
                                        _this.gameConstants, wildernessInfo);
 
             _this.isInWilderness = true;
+        };
+
+        gameProxy.client.something = function () {
+
+            console.log('goddamnit');
         };
     },
 
@@ -90,9 +95,10 @@ var Game = {
 
         // Handle mouse clicks
         this.canvasManager.getCanvas().on('mouse:up', function (event) {
-            var objId = event.target.id || false;
 
-            if (objId) {
+            if (event.target && event.target.id) {
+                var objId = event.target.id;
+
                 if (objId.indexOf('PlayerDisplay') !== -1) {
                     _this.player.playerDisplay.addPlayerDisplayOptions(objId, event);
                 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,14 +8,17 @@ namespace SignalRApp.Server
 {
     public class Wilderness
     {
+        private readonly IHubContext _context;
 
         public int wildernessWidth { get; set; }
         public int wildernessHeight { get; set; }
 
         public List<WildernessStructure> wildernessStructureObjects { get; set; }
 
-        public Wilderness()
+        public Wilderness(IHubContext context)
         {
+            _context = context;
+
             Random rnd = new Random();
 
             wildernessWidth = rnd.Next(32, 50);
@@ -29,6 +33,18 @@ namespace SignalRApp.Server
                 WildernessStructure nextStruct = new WildernessStructure(rnd);
                 wildernessStructureObjects.Add(nextStruct);
             }
+        }
+
+        public void EnterWilderness(string connectionId, string partyName, Wilderness wilderness)
+        {
+            
+            if (string.IsNullOrEmpty(partyName))
+            {
+                _context.Clients.Client(connectionId).createAndEnterWilderness(wilderness);
+                return;
+            }
+
+            _context.Clients.Group(partyName).createAndEnterWilderness(wilderness);
         }
     }
 

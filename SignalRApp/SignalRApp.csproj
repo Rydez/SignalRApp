@@ -168,7 +168,7 @@
     <Content Include="Client\Player\PlayerController.js" />
     <Content Include="Client\Player\PlayerCreator.js" />
     <Content Include="Client\Player\Player.js" />
-    <Content Include="Client\Map\Structures.js" />
+    <Content Include="Client\Map\VillageStructures.js" />
     <Content Include="Client\Map\VillageCreator.js" />
     <Content Include="Client\Player\PlayerDisplay.js" />
     <Content Include="Client\Player\PlayerUtilities.js" />
