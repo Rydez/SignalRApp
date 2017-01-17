@@ -70,7 +70,7 @@ var Game = {
 
         this.mouseBindings();
         this.setKeyboardBindings();
-        this.windowBindings();
+        this.setWindowBindings();
         this.showGame();
     },
 
@@ -167,6 +167,21 @@ var Game = {
         });
     },
 
+    setWindowBindings: function () {
+        var _this = this;
+
+        // Window resizes
+        $(window).resize(function () {
+            if (_this.isInWilderness) {
+                _this.windowBindings(_this.wilderness.wildernessCursor);
+            }
+            else {
+                _this.windowBindings(_this.cursorFabric);
+            }
+
+        });
+    },
+
     keyboardBindings: function (event, cursor) {
         var _this = this;
 
@@ -184,27 +199,27 @@ var Game = {
             _this.structureMenuManager.promptMenu(event.which, _this.player.playerCreator.playerSprite);
         }
 
-        var mapShifts = _this.map.mapController.getMapShifts();
-        cursor.syncWithMap(mapShifts);
-        _this.player.playerController.syncWithMap(mapShifts);
-        _this.player.playerCreator.syncWithMap(mapShifts);
-        _this.player.playerDisplay.syncWithMap(mapShifts);
-        _this.party.syncWithMap(mapShifts);
+        _this.map.mapController.syncComponentsWithMap(_this.player, _this.party, cursor);
+
+        //var mapShifts = _this.map.mapController.getMapShifts();
+        //cursor.syncWithMap(mapShifts);
+        //_this.player.playerController.syncWithMap(mapShifts);
+        //_this.player.playerCreator.syncWithMap(mapShifts);
+        //_this.player.playerDisplay.syncWithMap();
+        //_this.party.syncWithMap();
 
         var pathSteps = cursor.getPathSteps();
         _this.player.playerController.syncWithCursor(pathSteps);
     },
 
-    windowBindings: function () {
+    windowBindings: function (cursor) {
         var _this = this;
 
-        // Handle resizing the window and canvas
-        $(window).resize(function () {
-            _this.canvasManager.resizeCanvas();
-            _this.map.mapController.syncWithWindow(_this.canvasManager.getDimensions());
-            _this.cursorFabric.syncWithWindow(_this.canvasManager.getDimensions());
-            _this.player.playerController.syncWithWindow(_this.canvasManager.getDimensions());
-        });
+        _this.canvasManager.resizeCanvas(_this.map, _this.player, _this.party, cursor);
+        //_this.canvasManager.resizeCanvas();
+        _this.map.mapController.syncWithWindow(_this.canvasManager.getDimensions());
+        _this.cursorFabric.syncWithWindow(_this.canvasManager.getDimensions());
+        _this.player.playerController.syncWithWindow(_this.canvasManager.getDimensions());
     }
 
 };

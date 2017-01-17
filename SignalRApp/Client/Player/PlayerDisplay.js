@@ -21,7 +21,7 @@ var PlayerDisplay = {
 
     },
 
-    syncWithMap: function (shifts) {
+    syncWithMap: function () {
         if (this.localPlayerDisplay) {
             this.localPlayerDisplay.set({
                 left: this.leftLocalDisplayMargin,

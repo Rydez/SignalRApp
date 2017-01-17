@@ -27,6 +27,15 @@ var MapController = {
         this._canvasPixelHeight = canvasDimensions.height;
     },
 
+    syncComponentsWithMap: function (player, party, cursor) {
+        var mapShifts = this.getMapShifts();
+        cursor.syncWithMap(mapShifts);
+        player.playerController.syncWithMap(mapShifts);
+        player.playerCreator.syncWithMap(mapShifts);
+        player.playerDisplay.syncWithMap();
+        party.syncWithMap();
+    },
+
     controlMap: function (KeyCode) {
 
         // Best to have delta set to a number
@@ -100,7 +109,11 @@ var MapController = {
 
     checkForBoundary: function (canvasObjects, leftDelta, topDelta) {
 
+        //TODO: this is inefficient. Get the actual land background
+        // and pass it in here. It will need to then be changed
+        // when the wilderness is started.
         for (var i = 0; i < canvasObjects.length; i++) {
+
             // Obj is shorthand for canvasObjects[i]
             var obj = canvasObjects[i];
             var objLeft = obj.getLeft();

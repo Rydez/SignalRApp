@@ -82,31 +82,35 @@ var CanvasManager = {
     mapShiftAdjustment: function () {
 
         // Adjust map shift so that map is within
-        // boundaries when browser is expanded
+        // boundaries when browser is expanded on the right
+        // and bottom when the map has been scrolled completely
+        // to the right or bottom
         var canvasObjects = this.gameCanvas.getObjects();
 
         this.overBoundary = false;
         var xOverBoundary = 0;
         var yOverBoundary = 0;
         for (var i = 0; i < canvasObjects.length; i++) {
-            var currentLeft = canvasObjects[i].getLeft();
-            var currentTop = canvasObjects[i].getTop();
-            if (canvasObjects[i].id && canvasObjects[i].id === 'lastTile') {
-                if (currentLeft - (this.tileWidth / 2) < this._canvasPixelWidth) {
-                    xOverBoundary = (this._canvasPixelWidth - currentLeft) - (this.tileWidth / 2);
+            if (canvasObjects[i].id && canvasObjects[i].id === 'landBackground') {
+                var backgroundLeft = canvasObjects[i].getLeft();
+                var backgroundTop = canvasObjects[i].getTop();
+                var backgroundWidth = canvasObjects[i].width;
+                var backgroundHeight = canvasObjects[i].height;
+                if (backgroundLeft + backgroundWidth < this._canvasPixelWidth) {
+                    xOverBoundary = this._canvasPixelWidth - (backgroundLeft + backgroundWidth);
                     this.overBoundary = true;
                 }
 
-                if (currentTop - (this.tileHeight / 2) < this._canvasPixelHeight) {
-                    yOverBoundary = (this._canvasPixelHeight - currentTop) - (this.tileHeight / 2);
+                if (backgroundTop + backgroundHeight < this._canvasPixelHeight) {
+                    yOverBoundary = this._canvasPixelHeight - (backgroundTop + backgroundHeight);
                     this.overBoundary = true;
                 }
             }
         }
 
         var shiftAdjustment = {
-            xOverBoundary: xOverBoundary,
-            yOverBoundary: yOverBoundary
+            left: xOverBoundary,
+            top: yOverBoundary
         };
 
         return shiftAdjustment;
@@ -121,8 +125,8 @@ var CanvasManager = {
             var currentTop = canvasObjects[i].getTop();
 
             if (this.overBoundary) {
-                var xAdjusted = currentLeft + shiftAdjustment.xOverBoundary;
-                var yAdjusted = currentTop + shiftAdjustment.yOverBoundary;
+                var xAdjusted = currentLeft + shiftAdjustment.left;
+                var yAdjusted = currentTop + shiftAdjustment.top;
 
                 // Update object positions
                 canvasObjects[i].set({
@@ -133,19 +137,31 @@ var CanvasManager = {
                 canvasObjects[i].setCoords();
             }
             this.fabricUtilities.setObjectVisibility(canvasObjects[i],
-                                                     xAdjusted, yAdjusted,
-                                                     this._canvasPixelWidth,
-                                                     this._canvasPixelHeight);
+                                   xAdjusted, yAdjusted, this._canvasPixelWidth,
+                                   this._canvasPixelHeight);
         }
         this.gameCanvas.renderAll();
     },
 
-    resizeCanvas: function () {
+    resizeCanvas: function (map, player, party, cursor) {
+    //resizeCanvas: function () {
 
         var canvasDimensions = this.calculateCanvasSize();
 
         // Get necessary adjustment from browser expansion
         var shiftAdjustment = this.mapShiftAdjustment();
+
+        // Sync up elements with correct adjustments
+        map.mapController._leftShift += shiftAdjustment.left;
+        map.mapController._topShift += shiftAdjustment.top;
+        map.mapController.syncComponentsWithMap(player, party, cursor);
+        //var mapShifts = map.mapController.getMapShifts();
+        //cursor.syncWithMap(mapShifts);
+        //player.playerController.syncWithMap(mapShifts);
+        //player.playerCreator.syncWithMap(mapShifts);
+        //player.playerDisplay.syncWithMap();
+        //party.syncWithMap();
+
 
         // Update the positions and visibilities 
         // upon browser expansion

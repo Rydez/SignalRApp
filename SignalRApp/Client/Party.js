@@ -144,7 +144,7 @@ var Party = {
         };
     },
 
-    syncWithMap: function (shifts) {
+    syncWithMap: function () {
         if (this.memberDisplayGroups.length > 0) {
             for (var i = 0; i < this.memberDisplayGroups.length; i++) {
                 this.memberDisplayGroups[i].memberDisplayGroup.set({
