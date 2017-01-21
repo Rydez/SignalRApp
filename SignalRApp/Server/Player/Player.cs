@@ -61,5 +61,25 @@ namespace SignalRApp.Server
             xPos = X_OFF_SET + 0.5 * TILE_WIDTH * (xIndex + yIndex);
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }
+
+        public void updateVillagePosition(string dir, double vel)
+        {
+            if (dir == "up")
+            {
+                yPos -= vel;
+            }
+            else if (dir == "left")
+            {
+                xPos -= vel;
+            }
+            else if (dir == "down")
+            {
+                yPos += vel;
+            }
+            else if (dir == "right")
+            {
+                xPos += vel;
+            }
+        }
     }
 }

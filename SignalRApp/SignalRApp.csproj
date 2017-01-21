@@ -142,6 +142,7 @@
     <Content Include="Client\Account.js" />
     <Content Include="Client\CanvasManager.js" />
     <Content Include="Client\Chat.js" />
+    <Content Include="Client\Common\FabricSpriteSheet.js" />
     <Content Include="Client\Common\FabricUtilities.js" />
     <Content Include="Client\css\account.css" />
     <Content Include="Client\css\index.css" />
@@ -160,6 +161,7 @@
     <Content Include="Client\images\player_display.png" />
     <Content Include="Client\images\stable.png" />
     <Content Include="Client\images\stick-player.png" />
+    <Content Include="Client\images\testSprite.png" />
     <Content Include="Client\images\tree1.png" />
     <Content Include="Client\Map\MapController.js" />
     <Content Include="Client\Map\Map.js" />
@@ -209,6 +211,8 @@
     <Content Include="Scripts\jquery.signalR-2.2.1.min.js" />
     <Content Include="specRunner.html" />
     <Content Include="Specs\VillageCreatorSpec.js" />
+    <Content Include="TestPage.html" />
+    <Content Include="TestScript.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

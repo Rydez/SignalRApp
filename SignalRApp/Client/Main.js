@@ -2,9 +2,10 @@
 //TODO: The underscore naming convention needs to be removed.
 // Or, enacted fully and underscored names should be 
 // made private
+// Probably use prototype method. 
 
 //TODO: Maybe put the create structures function within the cache
-// land function
+// land function to ensure structures are created after map
 
 //TODO: Clean up the liberal use of renderAll() so that it's 
 // only used when necessary

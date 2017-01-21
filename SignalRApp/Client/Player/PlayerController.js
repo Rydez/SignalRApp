@@ -16,6 +16,22 @@ var PlayerController = {
         this.pathSteps = [];
         this.playerIsMoving = false;
 
+        this.isInVillage = true;
+        this.maxVelocity = 6;
+        this.acceleration = 2;
+        this.currentVelocity = {
+            up: 0,
+            down: 0,
+            left: 0,
+            right: 0
+        };
+        this.currentDirection = {
+            up: false,
+            down: false,
+            left: false,
+            right: false
+        };
+
         this._structureObjects = structureObjects;
 
         // In units of pixels
@@ -39,6 +55,82 @@ var PlayerController = {
     syncWithMap: function (shifts) {
         this.mapLeftShift = shifts.left;
         this.mapTopShift = shifts.top;
+    },
+
+    villageMovementLoop: function () {
+
+        // Player movement loops for village
+        var _this = this;
+        function movementLoop() {
+            for (direction in _this.currentDirection) {
+
+                // Accelerate
+                if (_this.currentDirection[direction]) {
+                    if (_this.currentVelocity[direction] < _this.maxVelocity) {
+                        _this.currentVelocity[direction] += _this.acceleration;
+                    }
+                }
+
+                // Decelerate
+                else {
+                    if (_this.currentVelocity[direction] > 0) {
+                        _this.currentVelocity[direction] -= _this.acceleration;
+                    }
+                }
+
+                // Move player accordingly
+                var vel = _this.currentVelocity[direction];
+                _this.playerHubProxy.server.movePlayerInVillage(direction, vel);
+            }
+
+            if (_this.isInVillage) {
+                requestAnimationFrame(movementLoop);
+            }
+        }
+        movementLoop();
+    },
+
+    changeDirection: function (keyCode, keyDirection) {
+
+        // w = 87
+        if (keyCode === 87) {
+            if (keyDirection === 'up') {
+                this.currentDirection.up = false;
+            }
+            else if (keyDirection === 'down') {
+                this.currentDirection.up = true;
+            }
+        }
+
+        // a = 65
+        else if (keyCode === 65) {
+            if (keyDirection === 'up') {
+                this.currentDirection.left = false;
+            }
+            else if (keyDirection === 'down') {
+                this.currentDirection.left = true;
+            }
+        }
+
+        // s = 83
+        else if (keyCode === 83) {
+            if (keyDirection === 'up') {
+                this.currentDirection.down = false;
+            }
+            else if (keyDirection === 'down') {
+                this.currentDirection.down = true;
+            }
+        }
+
+        // d = 68
+        else if (keyCode === 68) {
+            if (keyDirection === 'up') {
+                this.currentDirection.right = false;
+            }
+            else if (keyDirection === 'down') {
+                this.currentDirection.right = true;
+            }
+        }
     },
 
     traversePath: function () {
@@ -69,7 +161,7 @@ var PlayerController = {
         setTimeout(takePathStep, 100);
     },
 
-    controlPlayer: function (KeyCode, cursorFabric) {
+    selectMovementPath: function (KeyCode, cursorFabric) {
 
         // Only move player if enter was pressed
         if (KeyCode === 13 && this.playerIsMoving === false) {

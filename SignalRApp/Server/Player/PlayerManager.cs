@@ -201,16 +201,30 @@ namespace SignalRApp.Server
 
             return namedPlayer.name;
         }
-
-        // Move a player
+        
         public void Move(string connectionId, double xStepIndex, double yStepIndex)
         {
+
             // Get the player which has moved
             Player movingPlayer;
             IdPlayerPairs.TryGetValue(connectionId, out movingPlayer);
 
             // Update player position to that of the cursor
             movingPlayer.goToNextStep(xStepIndex, yStepIndex);
+
+            // Update all clients with the movement
+            _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
+        }
+
+        public void MoveInVillage(string connectionId, string dir, double vel)
+        {
+
+            // Get the player which has moved
+            Player movingPlayer;
+            IdPlayerPairs.TryGetValue(connectionId, out movingPlayer);
+
+            // Update player position to that of the cursor
+            movingPlayer.updateVillagePosition(dir, vel);
 
             // Update all clients with the movement
             _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);

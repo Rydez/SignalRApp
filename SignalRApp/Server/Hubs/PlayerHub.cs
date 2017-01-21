@@ -21,6 +21,11 @@ namespace SignalRApp.Hubs
             PlayerManager.Move(Context.ConnectionId, xStepIndex, yStepIndex);
         }
 
+        public void MovePlayerInVillage(string dir, double vel)
+        {
+            PlayerManager.MoveInVillage(Context.ConnectionId, dir, vel);
+        }
+
         public void GetRemotePlayerDisplayInfo(string remoteConnectionId)
         {
             PlayerManager.RemoteDisplayInfo(remoteConnectionId, Context.ConnectionId);

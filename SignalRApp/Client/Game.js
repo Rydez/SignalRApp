@@ -153,17 +153,26 @@ var Game = {
     },
 
     setKeyboardBindings: function () {
-        var _this = this;
+        if (!this.isInWilderness) {
+            this.player.playerController.villageMovementLoop();
+        }
 
         // Handle key downs
+        var _this = this;
         $(document).keydown(function (event) {
             if (_this.isInWilderness) {
-                _this.keyboardBindings(event, _this.wilderness.wildernessCursor);
+                _this.wildernessKeyboardBindings(event, _this.wilderness.wildernessCursor);
             }
             else {
-                _this.keyboardBindings(event, _this.cursorFabric);
+                _this.villageKeyboardBindings(event, _this.cursorFabric);
+                _this.player.playerController.changeDirection(event.which, 'down');
             }
+        });
 
+        $(document).keyup(function (event) {
+            if (!_this.isInWilderness) {
+                _this.player.playerController.changeDirection(event.which, 'up');
+            }
         });
     },
 
@@ -182,41 +191,48 @@ var Game = {
         });
     },
 
-    keyboardBindings: function (event, cursor) {
-        var _this = this;
+    villageKeyboardBindings: function (event, cursor) {
 
         // check if player is chatting
-        var isChatting = _this.chat.checkPlayerChatting();
+        var isChatting = this.chat.checkPlayerChatting();
         if (isChatting) {
-            _this.chat.sendMessageToAll(event.which);
-            _this.chat.unfocusChat(event.which);
+            this.chat.sendMessageToAll(event.which);
+            this.chat.unfocusChat(event.which);
         }
         else {
-            _this.map.mapController.controlMap(event.which);
-            cursor.uncreatePath(event.which);
-            cursor.moveCursor(event.which);
-            _this.player.playerController.controlPlayer(event.which, cursor);
-            _this.structureMenuManager.promptMenu(event.which, _this.player.playerCreator.playerSprite);
+            this.map.mapController.controlMap(event.which);
+            this.structureMenuManager.promptMenu(event.which, this.player.playerCreator.playerSprite);
         }
 
-        _this.map.mapController.syncComponentsWithMap(_this.player, _this.party, cursor);
+        this.map.mapController.syncComponentsWithMap(this.player, this.party, cursor);
+    },
 
-        //var mapShifts = _this.map.mapController.getMapShifts();
-        //cursor.syncWithMap(mapShifts);
-        //_this.player.playerController.syncWithMap(mapShifts);
-        //_this.player.playerCreator.syncWithMap(mapShifts);
-        //_this.player.playerDisplay.syncWithMap();
-        //_this.party.syncWithMap();
+    wildernessKeyboardBindings: function (event, cursor) {
+
+        // check if player is chatting
+        var isChatting = this.chat.checkPlayerChatting();
+        if (isChatting) {
+            this.chat.sendMessageToAll(event.which);
+            this.chat.unfocusChat(event.which);
+        }
+        else {
+            this.map.mapController.controlMap(event.which);
+            cursor.uncreatePath(event.which);
+            cursor.moveCursor(event.which);
+            this.player.playerController.selectMovementPath(event.which, cursor);
+            this.structureMenuManager.promptMenu(event.which, this.player.playerCreator.playerSprite);
+        }
+
+        this.map.mapController.syncComponentsWithMap(this.player, this.party, cursor);
 
         var pathSteps = cursor.getPathSteps();
-        _this.player.playerController.syncWithCursor(pathSteps);
+        this.player.playerController.syncWithCursor(pathSteps);
     },
 
     windowBindings: function (cursor) {
         var _this = this;
 
         _this.canvasManager.resizeCanvas(_this.map, _this.player, _this.party, cursor);
-        //_this.canvasManager.resizeCanvas();
         _this.map.mapController.syncWithWindow(_this.canvasManager.getDimensions());
         _this.cursorFabric.syncWithWindow(_this.canvasManager.getDimensions());
         _this.player.playerController.syncWithWindow(_this.canvasManager.getDimensions());
