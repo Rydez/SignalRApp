@@ -16,9 +16,10 @@ var PlayerController = {
         this.pathSteps = [];
         this.playerIsMoving = false;
 
+        this.fps = 20;
         this.isInVillage = true;
         this.maxVelocity = 6;
-        this.acceleration = 2;
+        this.acceleration = 1;
         this.currentVelocity = {
             up: 0,
             down: 0,
@@ -77,14 +78,13 @@ var PlayerController = {
                         _this.currentVelocity[direction] -= _this.acceleration;
                     }
                 }
-
-                // Move player accordingly
-                var vel = _this.currentVelocity[direction];
-                _this.playerHubProxy.server.movePlayerInVillage(direction, vel);
             }
 
+            // Move player accordingly
+            _this.playerHubProxy.server.movePlayerInVillage(_this.currentVelocity);
+
             if (_this.isInVillage) {
-                requestAnimationFrame(movementLoop);
+                setTimeout(movementLoop, 1000/_this.fps);
             }
         }
         movementLoop();

@@ -144,8 +144,6 @@ var CanvasManager = {
     },
 
     resizeCanvas: function (map, player, party, cursor) {
-    //resizeCanvas: function () {
-
         var canvasDimensions = this.calculateCanvasSize();
 
         // Get necessary adjustment from browser expansion
@@ -155,13 +153,6 @@ var CanvasManager = {
         map.mapController._leftShift += shiftAdjustment.left;
         map.mapController._topShift += shiftAdjustment.top;
         map.mapController.syncComponentsWithMap(player, party, cursor);
-        //var mapShifts = map.mapController.getMapShifts();
-        //cursor.syncWithMap(mapShifts);
-        //player.playerController.syncWithMap(mapShifts);
-        //player.playerCreator.syncWithMap(mapShifts);
-        //player.playerDisplay.syncWithMap();
-        //party.syncWithMap();
-
 
         // Update the positions and visibilities 
         // upon browser expansion

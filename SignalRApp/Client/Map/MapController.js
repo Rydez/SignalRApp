@@ -29,7 +29,9 @@ var MapController = {
 
     syncComponentsWithMap: function (player, party, cursor) {
         var mapShifts = this.getMapShifts();
-        cursor.syncWithMap(mapShifts);
+        if (cursor) {
+            cursor.syncWithMap(mapShifts);
+        }
         player.playerController.syncWithMap(mapShifts);
         player.playerCreator.syncWithMap(mapShifts);
         player.playerDisplay.syncWithMap();

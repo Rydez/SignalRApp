@@ -21,9 +21,9 @@ namespace SignalRApp.Hubs
             PlayerManager.Move(Context.ConnectionId, xStepIndex, yStepIndex);
         }
 
-        public void MovePlayerInVillage(string dir, double vel)
+        public void MovePlayerInVillage(Dictionary<string, int> velocities)
         {
-            PlayerManager.MoveInVillage(Context.ConnectionId, dir, vel);
+            PlayerManager.MoveInVillage(Context.ConnectionId, velocities);
         }
 
         public void GetRemotePlayerDisplayInfo(string remoteConnectionId)

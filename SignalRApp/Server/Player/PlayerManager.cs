@@ -216,7 +216,7 @@ namespace SignalRApp.Server
             _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
         }
 
-        public void MoveInVillage(string connectionId, string dir, double vel)
+        public void MoveInVillage(string connectionId, Dictionary<string, int> velocities)
         {
 
             // Get the player which has moved
@@ -224,7 +224,7 @@ namespace SignalRApp.Server
             IdPlayerPairs.TryGetValue(connectionId, out movingPlayer);
 
             // Update player position to that of the cursor
-            movingPlayer.updateVillagePosition(dir, vel);
+            movingPlayer.updateVillagePosition(velocities);
 
             // Update all clients with the movement
             _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);

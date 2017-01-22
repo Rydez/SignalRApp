@@ -62,24 +62,20 @@ namespace SignalRApp.Server
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }
 
-        public void updateVillagePosition(string dir, double vel)
+        public void updateVillagePosition(Dictionary<string, int> velocities)
         {
-            if (dir == "up")
-            {
-                yPos -= vel;
-            }
-            else if (dir == "left")
-            {
-                xPos -= vel;
-            }
-            else if (dir == "down")
-            {
-                yPos += vel;
-            }
-            else if (dir == "right")
-            {
-                xPos += vel;
-            }
+            int upDelta;
+            int leftDelta;
+            int downDelta;
+            int rightDelta;
+            velocities.TryGetValue("up", out upDelta);
+            velocities.TryGetValue("left", out leftDelta);
+            velocities.TryGetValue("down", out downDelta);
+            velocities.TryGetValue("right", out rightDelta);
+            yPos -= upDelta;
+            xPos -= leftDelta;
+            yPos += downDelta;
+            xPos += rightDelta;
         }
     }
 }

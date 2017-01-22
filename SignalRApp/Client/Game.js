@@ -29,11 +29,6 @@ var Game = {
         this.structureMenuManager.initialize(gameProxy, playerHubProxy, this.canvasManager,
                 this.map.villageCreator.getStructureObjects());
 
-        this.cursorFabric = Object.create(CursorFabric);
-        this.cursorFabric.initialize(this.canvasManager.getCanvas(), this.gameConstants,
-                this.map.villageCreator.getStructureIndices(),
-                this.canvasManager.getDimensions());
-
         this.chat = Object.create(Chat);
         this.chat.initialize(gameProxy, chatHubProxy);
 
@@ -76,8 +71,7 @@ var Game = {
 
     showGame: function () {
 
-        // Set z indices, render, and show
-        this.cursorFabric._cursor.moveTo(1);
+        // Render, and show
         this.canvasManager.getCanvas().renderAll();
 
         // Unhide main container
@@ -161,10 +155,10 @@ var Game = {
         var _this = this;
         $(document).keydown(function (event) {
             if (_this.isInWilderness) {
-                _this.wildernessKeyboardBindings(event, _this.wilderness.wildernessCursor);
+                _this.wildernessKeyboardBindings(event);
             }
             else {
-                _this.villageKeyboardBindings(event, _this.cursorFabric);
+                _this.villageKeyboardBindings(event);
                 _this.player.playerController.changeDirection(event.which, 'down');
             }
         });
@@ -181,17 +175,11 @@ var Game = {
 
         // Window resizes
         $(window).resize(function () {
-            if (_this.isInWilderness) {
-                _this.windowBindings(_this.wilderness.wildernessCursor);
-            }
-            else {
-                _this.windowBindings(_this.cursorFabric);
-            }
-
+            _this.windowBindings();
         });
     },
 
-    villageKeyboardBindings: function (event, cursor) {
+    villageKeyboardBindings: function (event) {
 
         // check if player is chatting
         var isChatting = this.chat.checkPlayerChatting();
@@ -204,10 +192,10 @@ var Game = {
             this.structureMenuManager.promptMenu(event.which, this.player.playerCreator.playerSprite);
         }
 
-        this.map.mapController.syncComponentsWithMap(this.player, this.party, cursor);
+        this.map.mapController.syncComponentsWithMap(this.player, this.party);
     },
 
-    wildernessKeyboardBindings: function (event, cursor) {
+    wildernessKeyboardBindings: function (event) {
 
         // check if player is chatting
         var isChatting = this.chat.checkPlayerChatting();
@@ -217,25 +205,25 @@ var Game = {
         }
         else {
             this.map.mapController.controlMap(event.which);
-            cursor.uncreatePath(event.which);
-            cursor.moveCursor(event.which);
-            this.player.playerController.selectMovementPath(event.which, cursor);
+            this.wilderness.wildernessCursor.uncreatePath(event.which);
+            this.wilderness.wildernessCursor.moveCursor(event.which);
+            this.player.playerController.selectMovementPath(event.which, this.wilderness.wildernessCursor);
             this.structureMenuManager.promptMenu(event.which, this.player.playerCreator.playerSprite);
         }
 
-        this.map.mapController.syncComponentsWithMap(this.player, this.party, cursor);
+        this.map.mapController.syncComponentsWithMap(this.player, this.party, this.wilderness.wildernessCursor);
 
-        var pathSteps = cursor.getPathSteps();
+        var pathSteps = this.wilderness.wildernessCursor.getPathSteps();
         this.player.playerController.syncWithCursor(pathSteps);
     },
 
-    windowBindings: function (cursor) {
-        var _this = this;
+    windowBindings: function () {
+        this.canvasManager.resizeCanvas(this.map, this.player, this.party, this.wilderness.wildernessCursor);
+        this.map.mapController.syncWithWindow(this.canvasManager.getDimensions());
+        this.player.playerController.syncWithWindow(this.canvasManager.getDimensions());
 
-        _this.canvasManager.resizeCanvas(_this.map, _this.player, _this.party, cursor);
-        _this.map.mapController.syncWithWindow(_this.canvasManager.getDimensions());
-        _this.cursorFabric.syncWithWindow(_this.canvasManager.getDimensions());
-        _this.player.playerController.syncWithWindow(_this.canvasManager.getDimensions());
+        if (this.isInWilderness) {
+            this.wilderness.wildernessCursor.syncWithWindow(this.canvasManager.getDimensions());
+        }
     }
-
 };
