@@ -23,6 +23,7 @@ var Game = {
         this.player = Object.create(Player);
         this.player.initialize(gameProxy, playerHubProxy, this.canvasManager.getCanvas(),
                 this.gameConstants, this.map.villageCreator.getStructureObjects(),
+                this.map.villageCreator.getStructureIndices(),
                 this.canvasManager.getDimensions());
 
         this.structureMenuManager = Object.create(StructureMenuManager);

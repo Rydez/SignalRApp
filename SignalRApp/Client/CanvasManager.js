@@ -27,6 +27,7 @@ var CanvasManager = {
         this.setCanvasProperties();
     },
 
+    // TODO: This is pointless if there are no private members
     getCanvas: function () {
         return this.gameCanvas;
     },

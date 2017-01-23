@@ -1,11 +1,11 @@
 ﻿
 var Player = {
     initialize: function (gameProxy, playerHubProxy, gameCanvas, gameConstants,
-            structureObjects, canvasDimensions) {
+            structureObjects, structureIndices, canvasDimensions) {
 
         this.playerController = Object.create(PlayerController);
         this.playerController.initialize(playerHubProxy, gameCanvas, structureObjects,
-                canvasDimensions, gameConstants);
+                structureIndices, canvasDimensions, gameConstants);
 
         this.playerDisplay = Object.create(PlayerDisplay);
         this.playerDisplay.initialize(gameCanvas, playerHubProxy);

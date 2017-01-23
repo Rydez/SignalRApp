@@ -27,6 +27,14 @@ var GameConstants = {
         this.tileWidth = 80;
         this.tileHeight = 40;
 
+        this.fps = 20;
+        this.maxVelocity = 6;
+        this.acceleration = 1;
+
+        // Offsets for putting player center on tile
+        this.xPlayerOffset = 40;
+        this.yPlayerOffset = 7;
+
         // Upper left corner (or origin) of the tile from the center
         this.xTileOrigin = -0.5 * this.tileWidth;
         this.yTileOrigin = -0.5 * this.tileHeight;

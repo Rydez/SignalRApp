@@ -2,7 +2,7 @@
 
 var PlayerController = {
     initialize: function (playerHubProxy, gameCanvas, structureObjects,
-                          canvasDimensions, gameConstants) {
+                          structureIndices, canvasDimensions, gameConstants) {
 
         this.fabricUtilities = Object.create(FabricUtilities);
         this.playerUtilities = Object.create(PlayerUtilities);
@@ -12,14 +12,19 @@ var PlayerController = {
 
         this._gameCanvas = gameCanvas;
 
+        this.structureIndices = structureIndices;
+
         this.stepIncrement = 0;
         this.pathSteps = [];
         this.playerIsMoving = false;
 
-        this.fps = 20;
+        this.xPos;
+        this.yPos;
+
+        this.fps = gameConstants.fps;
         this.isInVillage = true;
-        this.maxVelocity = 6;
-        this.acceleration = 1;
+        this.maxVelocity = gameConstants.maxVelocity;
+        this.acceleration = gameConstants.acceleration;
         this.currentVelocity = {
             up: 0,
             down: 0,
@@ -36,6 +41,8 @@ var PlayerController = {
         this._structureObjects = structureObjects;
 
         // In units of pixels
+        this.xPlayerOffset = gameConstants.xPlayerOffset;
+        this.yPlayerOffset = gameConstants.yPlayerOffset;
         this._tileWidth = gameConstants.tileWidth;
         this._tileHeight = gameConstants.tileHeight;
         this._canvasPixelWidth = canvasDimensions.width;
@@ -56,6 +63,31 @@ var PlayerController = {
     syncWithMap: function (shifts) {
         this.mapLeftShift = shifts.left;
         this.mapTopShift = shifts.top;
+    },
+
+    playerCollision: function (xPos, yPos) {
+        var isCollided = false;
+        var allStructureIndices = this.structureIndices;
+
+        // Calculate the tile index that the player is on
+        var xIdx = (xPos - this.xPlayerOffset) / this._tileWidth +
+                   (yPos - this.yPlayerOffset) / this._tileHeight;
+        var yIdx = (xPos - this.xPlayerOffset) / this._tileWidth -
+                   (yPos - this.yPlayerOffset) / this._tileHeight;
+
+        for (var i = 0; i < allStructureIndices.length; i++) {
+
+            var singleStructureIndices = allStructureIndices[i];
+            for (var j = 0; j < singleStructureIndices.length; j++) {
+                 
+                var coveredTile = singleStructureIndices[j];
+                if (Math.round(xIdx) === coveredTile.xIndex &&
+                    Math.round(yIdx) === coveredTile.yIndex) {
+                    isCollided = true;
+                }
+            }
+        }
+        return isCollided;
     },
 
     villageMovementLoop: function () {
@@ -81,7 +113,15 @@ var PlayerController = {
             }
 
             // Move player accordingly
-            _this.playerHubProxy.server.movePlayerInVillage(_this.currentVelocity);
+            var newX = _this.xPos + 
+                       _this.currentVelocity["right"] - 
+                       _this.currentVelocity["left"];
+            var newY = _this.yPos + 
+                       _this.currentVelocity["down"] - 
+                       _this.currentVelocity["up"];
+            if (!_this.playerCollision(newX, newY)) {
+                _this.playerHubProxy.server.movePlayerInVillage(_this.currentVelocity);
+            }
 
             if (_this.isInVillage) {
                 setTimeout(movementLoop, 1000/_this.fps);
@@ -176,9 +216,10 @@ var PlayerController = {
             if (obj.id && obj.id === id) {
                 var leftPlayer = _this.mapLeftShift + xPos;
                 var topPlayer = _this.mapTopShift + yPos;
-
+                _this.xPos = xPos;
+                _this.yPos = yPos;
                 _this.fabricUtilities.setObjectVisibility(obj, leftPlayer, topPlayer,
-                        this._canvasPixelWidth, this._canvasPixelHeight);
+                        _this._canvasPixelWidth, _this._canvasPixelHeight);
 
                 obj.set({
                     left: leftPlayer,
