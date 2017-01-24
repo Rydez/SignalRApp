@@ -18,6 +18,9 @@
 //BUG: Scroll to the right side of the land and then stretch 
 //the right side of the browser outward
 
+//BUG: Not all party members are removed from village when they
+// go to the wildy
+
 //TOTEST: Try accepting invite after moving far away
 
 //TOTEST: Try ready checking after attempting to leave the village

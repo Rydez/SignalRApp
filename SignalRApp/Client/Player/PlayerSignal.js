@@ -10,8 +10,10 @@ var PlayerSignal = {
             if (playerCreator.playerSprite && isLocalPlayer) {
                 playerCreator.reAddPlayer();
             }
-            playerCreator.createPlayer(isLocalPlayer, id, name, xPos, yPos, level, gold,
-                                      health, mana);
+            else {
+                playerCreator.createPlayer(isLocalPlayer, id, name, xPos, yPos, level, gold,
+                          health, mana);
+            }
         };
 
         // Create remote player display
@@ -28,7 +30,7 @@ var PlayerSignal = {
 
         // Move player
         gameProxy.client.movePlayer = function (id, xPos, yPos) {
-            playerController.movePlayerSprite(id, xPos, yPos);
+            playerController.moveRemotePlayerSprite(id, xPos, yPos);
         };
     }
 };

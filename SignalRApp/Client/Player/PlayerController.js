@@ -2,7 +2,8 @@
 
 var PlayerController = {
     initialize: function (playerHubProxy, gameCanvas, structureObjects,
-                          structureIndices, canvasDimensions, gameConstants) {
+                          structureIndices, canvasDimensions, gameConstants,
+                          playerCreator) {
 
         this.fabricUtilities = Object.create(FabricUtilities);
         this.playerUtilities = Object.create(PlayerUtilities);
@@ -12,14 +13,13 @@ var PlayerController = {
 
         this._gameCanvas = gameCanvas;
 
+        this.playerCreator = playerCreator;
+
         this.structureIndices = structureIndices;
 
         this.stepIncrement = 0;
         this.pathSteps = [];
         this.playerIsMoving = false;
-
-        this.xPos;
-        this.yPos;
 
         this.fps = gameConstants.fps;
         this.isInVillage = true;
@@ -113,14 +113,17 @@ var PlayerController = {
             }
 
             // Move player accordingly
-            var newX = _this.xPos + 
-                       _this.currentVelocity["right"] - 
-                       _this.currentVelocity["left"];
-            var newY = _this.yPos + 
-                       _this.currentVelocity["down"] - 
-                       _this.currentVelocity["up"];
-            if (!_this.playerCollision(newX, newY)) {
-                _this.playerHubProxy.server.movePlayerInVillage(_this.currentVelocity);
+            if (_this.playerCreator && _this.playerCreator.playerSprite) {
+                var newX = _this.playerCreator.playerSprite.getLeft() +
+                           _this.currentVelocity["right"] -
+                           _this.currentVelocity["left"];
+                var newY = _this.playerCreator.playerSprite.getTop() +
+                           _this.currentVelocity["down"] -
+                           _this.currentVelocity["up"];
+                if (!_this.playerCollision(newX, newY)) {
+                    _this.playerHubProxy.server.movePlayerInVillage(_this.currentVelocity);
+                    _this.moveLocalPlayerSprite(newX, newY);
+                }
             }
 
             if (_this.isInVillage) {
@@ -190,6 +193,12 @@ var PlayerController = {
 
                 _this.playerHubProxy.server.movePlayer(xStepIndex, yStepIndex);
 
+                var xPos = _this.xPlayerOffset +
+                    0.5 * _this._tileWidth * (xStepIndex + yStepIndex);
+                var yPos = _this.yPlayerOffset +
+                    0.5 * _this._tileHeight * (xStepIndex - yStepIndex);
+                _this.moveLocalPlayerSprite(xPos, yPos);
+
                 _stepIncrement += 1;
 
                 setTimeout(takePathStep, 100);
@@ -210,14 +219,29 @@ var PlayerController = {
         }
     },
     
-    movePlayerSprite: function (id, xPos, yPos) {
+    moveLocalPlayerSprite: function (leftPlayer, topPlayer) {
+        if (this.playerCreator.playerSprite) {
+            this.playerCreator.playerSprite.set({
+                left: leftPlayer,
+                top: topPlayer
+            });
+            this.playerCreator.playerSprite.setCoords();
+
+            // Handle when the player is behind or
+            // in front of a structure
+            this.playerUtilities.handleStructureCollision(this.playerCreator.playerSprite,
+                                                this._structureObjects);
+
+            this._gameCanvas.renderAll();
+        }
+    },
+
+    moveRemotePlayerSprite: function (id, xPos, yPos) {
         var _this = this;
         _this._gameCanvas.forEachObject(function (obj) {
             if (obj.id && obj.id === id) {
                 var leftPlayer = _this.mapLeftShift + xPos;
                 var topPlayer = _this.mapTopShift + yPos;
-                _this.xPos = xPos;
-                _this.yPos = yPos;
                 _this.fabricUtilities.setObjectVisibility(obj, leftPlayer, topPlayer,
                         _this._canvasPixelWidth, _this._canvasPixelHeight);
 

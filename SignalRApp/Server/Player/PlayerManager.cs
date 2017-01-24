@@ -213,7 +213,7 @@ namespace SignalRApp.Server
             movingPlayer.goToNextStep(xStepIndex, yStepIndex);
 
             // Update all clients with the movement
-            _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
+            _context.Clients.AllExcept(connectionId).movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
         }
 
         public void MoveInVillage(string connectionId, Dictionary<string, int> velocities)
@@ -227,7 +227,7 @@ namespace SignalRApp.Server
             movingPlayer.updateVillagePosition(velocities);
 
             // Update all clients with the movement
-            _context.Clients.All.movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
+            _context.Clients.AllExcept(connectionId).movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
         }
 
         public void RemoteDisplayInfo(string remoteConnectionId, string localConnectionId)

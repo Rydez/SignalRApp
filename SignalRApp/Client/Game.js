@@ -51,17 +51,11 @@ var Game = {
 
             _this.isInWilderness = true;
         };
-
-        gameProxy.client.something = function () {
-
-            console.log('goddamnit');
-        };
     },
 
     startGame: function () {
 
-        // Sync The new client with other clients 
-        // (Really starts creation of all players)
+        // Starts creation of all players
         this.playerHubProxy.server.addAllPlayers();
 
         this.mouseBindings();
@@ -219,11 +213,12 @@ var Game = {
     },
 
     windowBindings: function () {
-        this.canvasManager.resizeCanvas(this.map, this.player, this.party, this.wilderness.wildernessCursor);
+        this.canvasManager.resizeCanvas(this.map, this.player, this.party);
         this.map.mapController.syncWithWindow(this.canvasManager.getDimensions());
         this.player.playerController.syncWithWindow(this.canvasManager.getDimensions());
 
         if (this.isInWilderness) {
+            this.canvasManager.resizeCanvas(this.map, this.player, this.party, this.wilderness.wildernessCursor);
             this.wilderness.wildernessCursor.syncWithWindow(this.canvasManager.getDimensions());
         }
     }
