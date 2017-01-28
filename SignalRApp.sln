@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRApp", "SignalRApp\SignalRApp.csproj", "{5F515985-6732-4FED-A8B0-46CF91092C3C}"
 EndProject
@@ -18,7 +18,6 @@ Global
 		{5F515985-6732-4FED-A8B0-46CF91092C3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F515985-6732-4FED-A8B0-46CF91092C3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6616385-E009-41C2-BE6F-B68D55AF435F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6616385-E009-41C2-BE6F-B68D55AF435F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6616385-E009-41C2-BE6F-B68D55AF435F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6616385-E009-41C2-BE6F-B68D55AF435F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

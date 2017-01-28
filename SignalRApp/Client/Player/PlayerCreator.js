@@ -49,7 +49,7 @@ var PlayerCreator = {
             });
 
             var playerFabricGroup = new fabric.Group([stickImage, playerLabel], {
-                id: id,
+                id: 'playerSprite:' + id,
                 originX: 'center',
                 originY: 'center',
                 left: _this.mapLeftShift + xPos,

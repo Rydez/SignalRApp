@@ -29,8 +29,12 @@ var PlayerSignal = {
         };
 
         // Move player
-        gameProxy.client.movePlayer = function (id, xPos, yPos) {
-            playerController.moveRemotePlayerSprite(id, xPos, yPos);
+        gameProxy.client.moveRemotePlayers = function (serializedOtherPlayerMovements) {
+            var otherPlayerMovements = JSON.parse(serializedOtherPlayerMovements);
+            if (playerCreator && playerCreator.playerSprite) {
+                playerController.updateRemotePlayerMovements(otherPlayerMovements);
+                playerController.moveRemotePlayerSprites();
+            }
         };
     }
 };

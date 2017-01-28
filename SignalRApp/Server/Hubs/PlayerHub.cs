@@ -9,6 +9,9 @@ namespace SignalRApp.Hubs
 {
     public class PlayerHub : GameHub
     {
+        // TODO: Seems that the structure of these functions is 
+        // indicative of this file or the PlayerManager.cs file
+        // being unnecessary.
         
         public void AddAllPlayers()
         {
@@ -21,10 +24,15 @@ namespace SignalRApp.Hubs
             PlayerManager.Move(Context.ConnectionId, xStepIndex, yStepIndex);
         }
 
-        public void MovePlayerInVillage(Dictionary<string, int> velocities)
+        public void SendLocalPlayerMovements(List<List<int>> localPlayerMovements)
         {
-            PlayerManager.MoveInVillage(Context.ConnectionId, velocities);
+            PlayerManager.StoreLocalPlayerMovements(Context.ConnectionId, localPlayerMovements);
         }
+
+        //public void MovePlayerInVillage(Dictionary<string, int> velocities)
+        //{
+        //    PlayerManager.MoveInVillage(Context.ConnectionId, velocities);
+        //}
 
         public void GetRemotePlayerDisplayInfo(string remoteConnectionId)
         {

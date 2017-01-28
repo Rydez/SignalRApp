@@ -24,6 +24,8 @@ namespace SignalRApp.Server
         public double xPos { get; set; }
         public double yPos { get; set; }
 
+        public List<List<int>> storedMovements { get; set; }
+
         // Help player stand ON tile
         public int X_OFF_SET { get; set; }
         public int Y_OFF_SET { get; set; }
@@ -39,6 +41,8 @@ namespace SignalRApp.Server
         // Constructor
         public Player()
         {
+            storedMovements = new List<List<int>>();
+
             isReadyForWilderness = false;
 
             X_OFF_SET = 40;
@@ -62,20 +66,20 @@ namespace SignalRApp.Server
             yPos = Y_OFF_SET + 0.5 * TILE_HEIGHT * (xIndex - yIndex);
         }
 
-        public void updateVillagePosition(Dictionary<string, int> velocities)
-        {
-            int upDelta;
-            int leftDelta;
-            int downDelta;
-            int rightDelta;
-            velocities.TryGetValue("up", out upDelta);
-            velocities.TryGetValue("left", out leftDelta);
-            velocities.TryGetValue("down", out downDelta);
-            velocities.TryGetValue("right", out rightDelta);
-            yPos -= upDelta;
-            xPos -= leftDelta;
-            yPos += downDelta;
-            xPos += rightDelta;
-        }
+        //public void updateVillagePosition(Dictionary<string, int> velocities)
+        //{
+        //    int upDelta;
+        //    int leftDelta;
+        //    int downDelta;
+        //    int rightDelta;
+        //    velocities.TryGetValue("up", out upDelta);
+        //    velocities.TryGetValue("left", out leftDelta);
+        //    velocities.TryGetValue("down", out downDelta);
+        //    velocities.TryGetValue("right", out rightDelta);
+        //    yPos -= upDelta;
+        //    xPos -= leftDelta;
+        //    yPos += downDelta;
+        //    xPos += rightDelta;
+        //}
     }
 }

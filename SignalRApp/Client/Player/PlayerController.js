@@ -22,7 +22,10 @@ var PlayerController = {
         this.playerIsMoving = false;
 
         this.fps = gameConstants.fps;
+        this.updateRate = gameConstants.updateRate;
         this.isInVillage = true;
+        this.unsentMovementSteps = [];
+        this.otherPlayerMovements = {};
         this.maxVelocity = gameConstants.maxVelocity;
         this.acceleration = gameConstants.acceleration;
         this.currentVelocity = {
@@ -91,6 +94,7 @@ var PlayerController = {
     },
 
     villageMovementLoop: function () {
+        var sendStepsCounter = 0;
 
         // Player movement loops for village
         var _this = this;
@@ -115,14 +119,23 @@ var PlayerController = {
             // Move player accordingly
             if (_this.playerCreator && _this.playerCreator.playerSprite) {
                 var newX = _this.playerCreator.playerSprite.getLeft() +
-                           _this.currentVelocity["right"] -
-                           _this.currentVelocity["left"];
+                            _this.currentVelocity["right"] -
+                            _this.currentVelocity["left"];
                 var newY = _this.playerCreator.playerSprite.getTop() +
-                           _this.currentVelocity["down"] -
-                           _this.currentVelocity["up"];
+                            _this.currentVelocity["down"] -
+                            _this.currentVelocity["up"];
                 if (!_this.playerCollision(newX, newY)) {
-                    _this.playerHubProxy.server.movePlayerInVillage(_this.currentVelocity);
+                    //_this.playerHubProxy.server.movePlayerInVillage(_this.currentVelocity);
                     _this.moveLocalPlayerSprite(newX, newY);
+                    _this.unsentMovementSteps.push([
+                        newX - _this.mapLeftShift,
+                        newY - _this.mapTopShift
+                    ]);
+                    sendStepsCounter += 1;
+                    if ((sendStepsCounter * _this.updateRate) % _this.fps === 0) {
+                        _this.playerHubProxy.server.sendLocalPlayerMovements(_this.unsentMovementSteps);
+                        _this.unsentMovementSteps.length = 0;
+                    }
                 }
             }
 
@@ -130,7 +143,20 @@ var PlayerController = {
                 setTimeout(movementLoop, 1000/_this.fps);
             }
         }
+        
         movementLoop();
+    },
+
+    stopPlayer: function () {
+        this.currentVelocity.up = 0;
+        this.currentVelocity.left = 0;
+        this.currentVelocity.down = 0;
+        this.currentVelocity.right = 0;
+
+        this.currentDirection.up = false;
+        this.currentDirection.left = false;
+        this.currentDirection.down = false;
+        this.currentDirection.right = false;
     },
 
     changeDirection: function (keyCode, keyDirection) {
@@ -236,26 +262,68 @@ var PlayerController = {
         }
     },
 
-    moveRemotePlayerSprite: function (id, xPos, yPos) {
+    updateRemotePlayerMovements: function (newOtherPlayerMovements) {
+        var playerIds = Object.keys(newOtherPlayerMovements);
+        for (var i = 0; i < playerIds.length; i++) {
+
+            // Don't include the local player
+            if (playerIds[i] != this.playerCreator.playerSprite.id.split(':')[1]) {
+                var newMovements = newOtherPlayerMovements[playerIds[i]];
+
+                // Create an empty array property if is doesn't exist
+                if (!this.otherPlayerMovements[playerIds[i]]) {
+                    this.otherPlayerMovements[playerIds[i]] = [];
+                }
+
+                // Add the new movements for each player
+                this.otherPlayerMovements[playerIds[i]].push.apply(this.otherPlayerMovements[playerIds[i]], newMovements);
+            }
+        }
+    },
+
+    moveRemotePlayerSprites: function () {
+        var playerIds = Object.keys(this.otherPlayerMovements);
         var _this = this;
         _this._gameCanvas.forEachObject(function (obj) {
-            if (obj.id && obj.id === id) {
-                var leftPlayer = _this.mapLeftShift + xPos;
-                var topPlayer = _this.mapTopShift + yPos;
-                _this.fabricUtilities.setObjectVisibility(obj, leftPlayer, topPlayer,
-                        _this._canvasPixelWidth, _this._canvasPixelHeight);
+            for (var i = 0; i < playerIds.length; i++) {
+                if (obj.id && obj.id.split(':')[1] === playerIds[i]) {
 
-                obj.set({
-                    left: leftPlayer,
-                    top: topPlayer
-                });
-                obj.setCoords();
+                    var remotePlayer = obj;
+                    var remotePlayerId = remotePlayer.id.split(':')[1];
+                    function moveRemotePlayerLoop(remotePlayer) {
+                        if (_this.otherPlayerMovements[remotePlayerId][0] &&
+                            _this.otherPlayerMovements[remotePlayerId][0][0]) {
+                            var leftPlayer = _this.mapLeftShift +
+                                _this.otherPlayerMovements[remotePlayerId][0][0];
+                            var topPlayer = _this.mapTopShift +
+                                _this.otherPlayerMovements[remotePlayerId][0][1];
 
-                // Handle when the player is behind or
-                // in front of a structure
-                _this.playerUtilities.handleStructureCollision(obj, _this._structureObjects);
+                        
+                            _this.otherPlayerMovements[remotePlayerId].shift();
+                            _this.fabricUtilities.setObjectVisibility(remotePlayer, leftPlayer, topPlayer,
+                                    _this._canvasPixelWidth, _this._canvasPixelHeight);
 
-                _this._gameCanvas.renderAll();
+                            remotePlayer.set({
+                                left: leftPlayer,
+                                top: topPlayer
+                            });
+                            remotePlayer.setCoords();
+
+                            // Handle when the player is behind or
+                            // in front of a structure
+                            _this.playerUtilities.handleStructureCollision(remotePlayer, _this._structureObjects);
+
+                            _this._gameCanvas.renderAll();
+
+                            if (_this.otherPlayerMovements[remotePlayerId].length !== 0) {
+                                setTimeout(function () {
+                                    moveRemotePlayerLoop(remotePlayer)
+                                }, 1000 / _this.fps);
+                            }
+                        }
+                    }
+                    moveRemotePlayerLoop(remotePlayer);
+                }
             }
         });
     }

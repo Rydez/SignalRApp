@@ -7,6 +7,9 @@ using System.Web;
 using Microsoft.AspNet.SignalR;
 using System.Collections.Concurrent;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SignalRApp.Server
 {
@@ -19,6 +22,11 @@ namespace SignalRApp.Server
         private static Dictionary<string, List<string>> PartyNameAndListOfPlayerIds = new Dictionary<string, List<string>>();
 
         private static Dictionary<string, string> PendingPartyNameAndPlayerId = new Dictionary<string, string>();
+
+        private static bool serverStarted = false;
+
+        // Update delay in seconds
+        private const int updateDelay = 3;
 
         struct PartyMemberInfo
         {
@@ -33,6 +41,48 @@ namespace SignalRApp.Server
         public PlayerManager(IHubContext context)
         {
             _context = context;
+            
+            if (serverStarted == false)
+            {
+                RemoteMovementLoop();
+                serverStarted = true;
+            }
+        }
+
+        public async Task RemoteMovementLoop()
+        {
+            await Task.Run(() =>
+            {
+                SendMovementsToClients();
+            });
+        }
+
+        public void SendMovementsToClients()
+        {
+            Dictionary<string, List<List<int>>> playerMovements = new Dictionary<string, List<List<int>>>();
+            while (true)
+            {
+                Thread.Sleep(updateDelay * 1000);
+                foreach (KeyValuePair<string, Player> idPlayerPair in IdPlayerPairs)
+                {
+                    string playerId = idPlayerPair.Key;
+                    Player player = idPlayerPair.Value;
+
+                    playerMovements.Add(playerId, player.storedMovements);
+                }
+                if (IdPlayerPairs.Count > 1)
+                {
+                    string serializedDict = JsonConvert.SerializeObject(playerMovements);
+                    _context.Clients.All.moveRemotePlayers(serializedDict);
+                }
+                foreach (KeyValuePair<string, Player> idPlayerPair in IdPlayerPairs)
+                {
+                    string playerId = idPlayerPair.Key;
+                    Player player = idPlayerPair.Value;
+                    player.storedMovements.Clear();
+                }
+                playerMovements.Clear();
+            }
         }
 
         // Get info ready to start game for client
@@ -179,19 +229,20 @@ namespace SignalRApp.Server
         {
 
             Player disconnectingPlayer;
-            IdPlayerPairs.TryGetValue(connectionId, out disconnectingPlayer);
-
-            if (!string.IsNullOrEmpty(disconnectingPlayer.partyName))
+            if (IdPlayerPairs.TryGetValue(connectionId, out disconnectingPlayer))
             {
-                LeaveParty(connectionId);
+                if (!string.IsNullOrEmpty(disconnectingPlayer.partyName))
+                {
+                    LeaveParty(connectionId);
+                }
+
+                // Remove disconnected player
+                _context.Clients.All.removePlayerFromRoom(disconnectingPlayer.ConnectionId);
+
+                // Get disconnected player
+                Player disconnectedPlayer;
+                IdPlayerPairs.TryRemove(connectionId, out disconnectedPlayer);
             }
-
-            // Remove disconnected player
-            _context.Clients.All.removePlayerFromRoom(disconnectingPlayer.ConnectionId);
-
-            // Get disconnected player
-            Player disconnectedPlayer;
-            IdPlayerPairs.TryRemove(connectionId, out disconnectedPlayer);
         }
 
         public string GetName(string connectionId)
@@ -216,35 +267,54 @@ namespace SignalRApp.Server
             _context.Clients.AllExcept(connectionId).movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
         }
 
-        public void MoveInVillage(string connectionId, Dictionary<string, int> velocities)
+        public void StoreLocalPlayerMovements(string connectionId, List<List<int>> localPlayerMovements)
         {
-
             // Get the player which has moved
             Player movingPlayer;
-            IdPlayerPairs.TryGetValue(connectionId, out movingPlayer);
+            if (IdPlayerPairs.TryGetValue(connectionId, out movingPlayer))
+            {
+                // Update with most recent location
+                movingPlayer.xPos = localPlayerMovements[localPlayerMovements.Count - 1][0];
+                movingPlayer.yPos = localPlayerMovements[localPlayerMovements.Count - 1][1];
 
-            // Update player position to that of the cursor
-            movingPlayer.updateVillagePosition(velocities);
+                if (IdPlayerPairs.Count <= 1)
+                {
+                    return;
+                }
 
-            // Update all clients with the movement
-            _context.Clients.AllExcept(connectionId).movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
+                movingPlayer.storedMovements.AddRange(localPlayerMovements);
+            }
         }
+
+        //public void MoveInVillage(string connectionId, Dictionary<string, int> velocities)
+        //{
+
+        //    // Get the player which has moved
+        //    Player movingPlayer;
+        //    IdPlayerPairs.TryGetValue(connectionId, out movingPlayer);
+            
+        //    movingPlayer.updateVillagePosition(velocities);
+
+        //    // Update all clients with the movement
+        //    _context.Clients.AllExcept(connectionId).movePlayer(connectionId, movingPlayer.xPos, movingPlayer.yPos);
+        //}
 
         public void RemoteDisplayInfo(string remoteConnectionId, string localConnectionId)
         {
             Player selectedPlayer;
-            IdPlayerPairs.TryGetValue(remoteConnectionId, out selectedPlayer);
-
-
-            // Check if local player is adding self
-            bool isLocalPlayer = false;
-            if (remoteConnectionId == localConnectionId)
+            if (IdPlayerPairs.TryGetValue(remoteConnectionId, out selectedPlayer))
             {
-                isLocalPlayer = true;
+
+                // Check if local player is adding self
+                bool isLocalPlayer = false;
+                if (remoteConnectionId == localConnectionId)
+                {
+                    isLocalPlayer = true;
+                }
+                _context.Clients.Client(localConnectionId).createRemotePlayerDisplay(isLocalPlayer,
+                           selectedPlayer.ConnectionId, selectedPlayer.name, selectedPlayer.level,
+                           selectedPlayer.gold, selectedPlayer.health, selectedPlayer.mana);
             }
-            _context.Clients.Client(localConnectionId).createRemotePlayerDisplay(isLocalPlayer,
-                       selectedPlayer.ConnectionId, selectedPlayer.name, selectedPlayer.level,
-                       selectedPlayer.gold, selectedPlayer.health, selectedPlayer.mana);
         }
 
         public void InvitePlayerToParty(string connectionId, string playerToInviteId)

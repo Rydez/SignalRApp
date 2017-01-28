@@ -124,7 +124,10 @@ var Game = {
 
                     // Remove pre existing player display before adding new one
                     _this.player.playerDisplay.removeRemotePlayerDisplay();
-                    _this.player.playerDisplay.addRemotePlayerDisplay(objId);
+
+                    if (objId.indexOf('playerSprite') !== -1) {
+                        _this.player.playerDisplay.addRemotePlayerDisplay(objId);
+                    }
                 }
             }
         });
@@ -171,6 +174,10 @@ var Game = {
         // Window resizes
         $(window).resize(function () {
             _this.windowBindings();
+        });
+
+        $(window).blur(function () {
+            _this.player.playerController.stopPlayer();
         });
     },
 

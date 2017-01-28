@@ -28,6 +28,11 @@ var GameConstants = {
         this.tileHeight = 40;
 
         this.fps = 20;
+
+        // The rate at which the player sends movements
+        // to server for village (updated per second)
+        this.updateRate = 1;
+
         this.maxVelocity = 6;
         this.acceleration = 1;
 

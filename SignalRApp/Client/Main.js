@@ -8,7 +8,8 @@
 // land function to ensure structures are created after map
 
 //TODO: Clean up the liberal use of renderAll() so that it's 
-// only used when necessary
+// only used when necessary. Note that if renderAll() is called
+// within some game loop, then all other renderAll() can be removed
 
 //TODO: Add reconnection handling for players in groups and in 
 // the wilderness.
